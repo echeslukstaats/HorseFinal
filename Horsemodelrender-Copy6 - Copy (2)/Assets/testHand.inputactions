@@ -1,0 +1,55 @@
+{
+    "version": 1,
+    "name": "testHand",
+    "maps": [
+        {
+            "name": "HandMovement",
+            "id": "928bbcb5-3311-4bb1-a9fc-8e3f28e90fc0",
+            "actions": [
+                {
+                    "name": "MoveUpDown",
+                    "type": "Value",
+                    "id": "37a39e8b-1ef9-4099-9398-ffe1bc95f941",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "bca389c0-2779-4563-b0ee-f9426a215436",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cfdac9c5-ae89-4b10-923d-8e0da0e6c8e2",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveUpDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a79898f-a2e7-4172-88fa-b05d84fee6d3",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

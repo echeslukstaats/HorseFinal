@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: New Avatar Mask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Horse
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin/LeftFoot
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin/LeftFoot/LeftToe1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin/LeftFoot/LeftToe1/LeftToe2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin/LeftFoot/LeftToe1/LeftToe2/BipLToeNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin/RightFoot
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin/RightFoot/RightToe1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin/RightFoot/RightToe1/RightToe2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin/RightFoot/RightToe1/RightToe2/BipRToeNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm/LeftForearm
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm/LeftForearm/LeftHand
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm/LeftForearm/LeftHand/LeftHoof1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm/LeftForearm/LeftHand/LeftHoof1/LeftHoof2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm/LeftForearm/LeftHand/LeftHoof1/LeftHoof2/BipLFingerNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/BipHeadNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032LeftLowerLid
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032LeftLowerLid/RootFBXASC032LeftLowerLidNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032LeftUpperLid
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032LeftUpperLid/RootFBXASC032LeftUpperLidNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032RightEyeBall
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/FBXASC032RightEyeBall/RootFBXASC032RightEyeBallNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/Jaw
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/Jaw/FBXASC032BottomLip
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/Jaw/FBXASC032BottomLip/RootFBXASC032BottomLipNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/Jaw/RootFBXASC032Xtra01Nub
+    m_Weight: 0
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftEar
+    m_Weight: 0
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftEar/BipLeftEarNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftEyeBall
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftEyeBall/RootFBXASC032LeftEyeBallNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftUpperLip
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/LeftUpperLip/RootFBXASC032LeftUpperLipNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightEar
+    m_Weight: 0
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightEar/BipRightEarNub
+    m_Weight: 0
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightLowerLid
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightLowerLid/RootFBXASC032RightLowerLidNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightUpperLid
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightUpperLid/RootFBXASC032RightUpperLidNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightUpperLip
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/Neck2/Neck3/RootFBXASC032Neck3/RootFBXASC032Neck4/Head/RightUpperLip/RootFBXASC032RightUpperLipNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm/RightForearm
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm/RightForearm/RightHand
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm/RightForearm/RightHand/RightHoof1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm/RightForearm/RightHand/RightHoof1/RightHoof2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/RightShoulder/RightArm/RightForearm/RightHand/RightHoof1/RightHoof2/BipRFingerNub
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Tail1
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Tail1/Tail2
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Tail1/Tail2/Tail3
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Tail1/Tail2/Tail3/RootFBXASC032Tail3
+    m_Weight: 1
+  - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Tail1/Tail2/Tail3/RootFBXASC032Tail3/BipTailNub
+    m_Weight: 1
+  - m_Path: Horse_1
+    m_Weight: 1
+  - m_Path: Horse_lowpoly
+    m_Weight: 1
+  - m_Path: HorseBone
+    m_Weight: 1

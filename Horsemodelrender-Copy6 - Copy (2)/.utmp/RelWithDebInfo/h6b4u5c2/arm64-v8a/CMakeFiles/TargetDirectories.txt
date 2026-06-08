@@ -1,0 +1,5 @@
+C:/Users/wumbo/Documents/Unity/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/h6b4u5c2/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/wumbo/Documents/Unity/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/h6b4u5c2/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/wumbo/Documents/Unity/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/h6b4u5c2/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/wumbo/Documents/Unity/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/h6b4u5c2/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/wumbo/Documents/Unity/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/h6b4u5c2/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
