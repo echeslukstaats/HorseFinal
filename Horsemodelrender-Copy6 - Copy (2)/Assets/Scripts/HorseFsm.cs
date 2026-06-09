@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Security.Cryptography.X509Certificates;
 
 public enum HorseStates
 {
@@ -41,6 +42,15 @@ public class HorseFsm : MonoBehaviour
     private float HorseEmotion = 0f;
     public bool hasGreeted = false;
     private bool kickStarted = false;
+
+    //Flinch system 
+    private bool flinchStarted = false;
+    private int legTouchedFirst = 0; // 0 = none, 1 = front left leg, 2 = front right leg, 3 = back left leg, 4 = back right leg
+    private int hoofTouched = 0; // 0 = none, 1 = front left hoof, 2 = front right hoof, 3 = back left hoof, 4 = back right hoof
+    private float legPrepTimer = 0f;
+    private const float LEG_PREP_TIMOUT = 3f;
+
+
 
     private void Start()
     {
@@ -104,6 +114,46 @@ public class HorseFsm : MonoBehaviour
                     SwitchState(HorseStates.Walking);
                     animator.SetInteger("BehaviourStates", (int)currState);
                     animator.SetLayerWeight(3, 1);
+                }
+
+                // Leg prep timer reset 
+                if (legTouchedFirst != 0)
+                {
+                    legPrepTimer += Time.deltaTime;
+                    if (legPrepTimer >= LEG_PREP_TIMOUT)
+                    {
+                        legTouchedFirst = 0;
+                        legPrepTimer = 0f;
+                    }
+                }
+
+                if (hoofTouched != 0)
+                {
+                    if (legTouchedFirst == hoofTouched)
+                    {
+                        // Leg touched first → normal kick on correct leg
+                        // handled by existing kick system
+                    }
+                    else
+                    {
+                        // Hoof touched directly, we flicnch
+                        if (!flinchStarted)
+                        {
+                            animator.SetInteger("FlinchState", hoofTouched);
+                            animator.SetLayerWeight(6, 1); // Flinch layer
+                            flinchStarted = true;
+                        }
+                    }
+                    hoofTouched = 0;
+                    legTouchedFirst = 0;
+                }
+
+                // Reset flinch when animation done
+                if (flinchStarted && animator.GetCurrentAnimatorStateInfo(6).IsName("Idle"))
+                {
+                    animator.SetLayerWeight(6, 0);
+                    animator.SetInteger("FlinchState", 0);
+                    flinchStarted = false;
                 }
                 break;
 
@@ -235,7 +285,7 @@ public class HorseFsm : MonoBehaviour
 
         HorseEmotion = 0f;
 
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 6; i++)
             animator.SetLayerWeight(i, 0f);
 
         legRigWeight.ChangeWeight(1f);
@@ -308,5 +358,16 @@ public class HorseFsm : MonoBehaviour
         Debug.Log("danger pet" + HorseEmotion);
         HorseEmotion -= 0.4f;
         startAnxiousTimer -= 2;
+    }
+
+    public void SetLegTouched(int legIndex)
+    {
+        legTouchedFirst = legIndex;
+        legPrepTimer = 0f;
+    }
+
+    public void SetHoofTouched(int hoofIndex)
+    {
+        hoofTouched = hoofIndex;
     }
 }
