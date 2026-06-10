@@ -1,1 +1,0 @@
-C:\Users\wumbo\Documents\Unity\Horsemodelrender-Copy6 - Copy (2)\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\h6b4u5c2\obj\arm64-v8a
