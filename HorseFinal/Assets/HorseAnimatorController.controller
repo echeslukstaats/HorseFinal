@@ -232,7 +232,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 2245133233877086591, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
+  m_Motion: {fileID: 1591442448509988138, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -476,7 +476,7 @@ AnimatorController:
   - serializedVersion: 5
     m_Name: FlinchLayer
     m_StateMachine: {fileID: -6010205994373503214}
-    m_Mask: {fileID: 31900000, guid: aba17a4cabab9224892ea5aa130876c3, type: 2}
+    m_Mask: {fileID: 0}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -661,7 +661,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 4410208255286334802, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
+  m_Motion: {fileID: -7442433316405695011, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -818,7 +818,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 999102617610215324, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
+  m_Motion: {fileID: -333205850019072056, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -899,7 +899,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 935099479920282792, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
+  m_Motion: {fileID: -8235645836927662316, guid: 5d9a9f6d5f81f1947a5bb6e983d4fd32, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

@@ -16,15 +16,15 @@ AvatarMask:
   - m_Path: CTRL_Pole_Leg
     m_Weight: 0
   - m_Path: Horse
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh
     m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/LeftThigh/LeftShin
@@ -50,13 +50,13 @@ AvatarMask:
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/RightThigh/RightShin/RightFoot/RightToe1/RightToe2/BipRToeNub
     m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder
     m_Weight: 1
   - m_Path: Horse/ArabianHorse/Master/Root/Pelvis/Spine1/Spine2/Spine3/Neck1/LeftShoulder/LeftArm
