@@ -20,22 +20,41 @@ public class HorsePettingScript : MonoBehaviour
     }
 
     private Dictionary<Transform, Queue<HandSample>> handHistory = new Dictionary<Transform, Queue<HandSample>>();
-
     private Dictionary<Transform, float> petTimes = new Dictionary<Transform, float>();
     private Dictionary<Transform, float> badPetTimers = new Dictionary<Transform, float>();
 
-    private float windowTime = 0.6f; 
+    // Tracks which hands are currently inside this collider so we can
+    // correctly call NotifyBodyTouch(false) on exit without double-counting.
+    private HashSet<Transform> handsInside = new HashSet<Transform>();
+
+    private float windowTime = 0.6f;
     private float badPetThreshold = 0.5f;
 
     private float dangerCooldown = 0f;
     private float dangerCooldownTime = 1f;
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("TrackedHand") || horseFsm.currState != HorseStates.Anxious)
-            return;
+        if (!other.CompareTag("TrackedHand")) return;
 
         Transform hand = other.transform;
+
+        if (handsInside.Add(hand))
+            horseFsm.NotifyBodyTouch(true);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        // Run in any state — gentle petting in None/Feeding builds trust,
+        // anxious handling still works as before.
+        if (!other.CompareTag("TrackedHand")) return;
+
+        Transform hand = other.transform;
+
+        // Catch any hand that entered without firing OnTriggerEnter
+        // (e.g. hand spawned inside the collider).
+        if (handsInside.Add(hand))
+            horseFsm.NotifyBodyTouch(true);
 
         if (!handHistory.ContainsKey(hand))
         {
@@ -46,7 +65,6 @@ public class HorsePettingScript : MonoBehaviour
 
         Queue<HandSample> history = handHistory[hand];
 
-        // add current sample
         history.Enqueue(new HandSample
         {
             pos = hand.position,
@@ -54,41 +72,38 @@ public class HorsePettingScript : MonoBehaviour
         });
 
         while (history.Count > 0 && Time.time - history.Peek().time > windowTime)
-        {
             history.Dequeue();
-        }
 
         float speed = CalculateSpeed(history, hand.position);
 
         HandleTouch(hand, speed);
     }
 
-    private float CalculateSpeed(Queue<HandSample> history, Vector3 currentPos)
-    {
-        if (history.Count < 2)
-            return 0f;
-
-        HandSample oldest = history.Peek();
-
-        float distance = Vector3.Distance(currentPos, oldest.pos);
-        float time = Time.time - oldest.time;
-
-        if (time <= 0f)
-            return 0f;
-
-        return distance / time;
-    }
-
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("TrackedHand"))
-            return;
+        if (!other.CompareTag("TrackedHand")) return;
 
         Transform hand = other.transform;
+
+        if (handsInside.Remove(hand))
+            horseFsm.NotifyBodyTouch(false);
 
         handHistory.Remove(hand);
         petTimes.Remove(hand);
         badPetTimers.Remove(hand);
+    }
+
+    private float CalculateSpeed(Queue<HandSample> history, Vector3 currentPos)
+    {
+        if (history.Count < 2) return 0f;
+
+        HandSample oldest = history.Peek();
+        float distance = Vector3.Distance(currentPos, oldest.pos);
+        float time = Time.time - oldest.time;
+
+        if (time <= 0f) return 0f;
+
+        return distance / time;
     }
 
     private void HandleTouch(Transform hand, float speed)
@@ -109,7 +124,12 @@ public class HorsePettingScript : MonoBehaviour
 
                 if (badPetTimers[hand] >= badPetThreshold)
                 {
-                    horseFsm.OnHarshTouch();
+                    // Only penalise emotion if the horse is already anxious —
+                    // a harsh touch during None state doesn't feel bad enough
+                    // to warrant a negative reaction yet.
+                    if (horseFsm.currState == HorseStates.Anxious)
+                        horseFsm.OnHarshTouch();
+
                     badPetTimers[hand] = 0f;
                 }
 
@@ -131,7 +151,6 @@ public class HorsePettingScript : MonoBehaviour
                 petTimes[hand] = Mathf.Max(0f, petTimes[hand] - Time.deltaTime * 0.5f);
             }
         }
-
         else if (petZoneType == PetZoneType.DangerZone)
         {
             dangerCooldown -= Time.deltaTime;

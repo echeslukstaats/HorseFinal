@@ -366,6 +366,14 @@ FodyWeavers.xsd
 *.sln
 
 .vscode/
+Library/
+Temp/
+obj/
+Build/
+Builds/
+Logs/
+userSettings/
+*.DS_Store
 
 # Unity generated
 /Library/

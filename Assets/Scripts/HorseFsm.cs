@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System.Security.Cryptography.X509Certificates;
 
 public enum HorseStates
 {
@@ -43,22 +42,31 @@ public class HorseFsm : MonoBehaviour
     public bool hasGreeted = false;
     private bool kickStarted = false;
 
-    //Flinch system 
+    // ── Body-touch ref-count (collègue) ──────────────────────────────────────
+    // Handles overlapping colliders cleanly; handOnBody is true as long as
+    // at least one body collider contains the hand.
+    private int bodyTouchCount = 0;
+    public bool handOnBody => bodyTouchCount > 0;
+    public float lastBodyTouchTime = -999f;
+    private const float BODY_TOUCH_GRACE = 1f;
+
+    private bool RumpTouchIsTrusted
+    {
+        get
+        {
+            float elapsed = Time.time - lastBodyTouchTime;
+            Debug.Log($"RumpTouchIsTrusted — hasGreeted:{hasGreeted} handOnBody:{handOnBody} elapsed:{elapsed:F2}s grace:{BODY_TOUCH_GRACE}s");
+            return hasGreeted && (handOnBody || elapsed <= BODY_TOUCH_GRACE);
+        }
+    }
+
+    // ── Flinch system (Khalis) ────────────────────────────────────────────────
     private bool flinchStarted = false;
     private bool flinchPlaying = false;
-    private int legTouchedFirst = 0; // 0 = none, 1 = front left leg, 2 = front right leg, 3 = back left leg, 4 = back right leg
-    private int hoofTouched = 0; // 0 = none, 1 = front left hoof, 2 = front right hoof, 3 = back left hoof, 4 = back right hoof
+    private int legTouchedFirst = 0; // 0=none 1=FL 2=FR 3=BL 4=BR
+    private int hoofTouched = 0;     // 0=none 1=FL 2=FR 3=BL 4=BR
     private float legPrepTimer = 0f;
     private const float LEG_PREP_TIMOUT = 3f;
-
-    // Leg Mover 
-
-    public LegMover legMover1;
-    public LegMover legMover2;
-    public LegMover legMover3;
-    public LegMover legMover4;
-
-
 
     private void Start()
     {
@@ -76,7 +84,6 @@ public class HorseFsm : MonoBehaviour
                 if (handNearMouth)
                 {
                     startFeedingTimer += Time.deltaTime;
-
                     if (startFeedingTimer >= 1f)
                     {
                         SwitchState(HorseStates.Feeding);
@@ -91,11 +98,11 @@ public class HorseFsm : MonoBehaviour
                     startFeedingTimer = 0;
                 }
 
-                if ((handBehindEar && !hasGreeted) || touchedBehind)
+                // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
+                if ((handBehindEar && !hasGreeted) || (touchedBehind && !RumpTouchIsTrusted))
                 {
                     HorseEmotion = -3f;
                     legRigWeight.ChangeWeight(0f);
-
                     SwitchState(HorseStates.Anxious);
                     animator.SetInteger("BehaviourStates", (int)currState);
 
@@ -124,7 +131,7 @@ public class HorseFsm : MonoBehaviour
                     animator.SetLayerWeight(3, 1);
                 }
 
-                // Leg prep timer reset 
+                // ── Flinch system (Khalis) ────────────────────────────────────
                 if (legTouchedFirst != 0)
                 {
                     legPrepTimer += Time.deltaTime;
@@ -138,34 +145,23 @@ public class HorseFsm : MonoBehaviour
                 if (hoofTouched != 0)
                 {
                     Debug.Log("Hoof touched: " + hoofTouched + " legTouchedFirst: " + legTouchedFirst + " flinchStarted: " + flinchStarted);
-                    if (legTouchedFirst == hoofTouched)
-                    {
-                        // Leg touched first → normal kick on correct leg
-                        // handled by existing kick system
-                    }
-                    else
+                    if (legTouchedFirst != hoofTouched)
                     {
                         Debug.Log("Triggering flinch on layer 6 with FlinchState: " + hoofTouched);
-                        // Hoof touched directly, we flicnch
                         if (!flinchStarted)
                         {
                             animator.SetInteger("FlinchState", hoofTouched);
-                            animator.SetLayerWeight(6, 1); // Flinch layer
+                            animator.SetLayerWeight(6, 1);
                             flinchStarted = true;
                             flinchPlaying = false;
-                            GetLegMover(hoofTouched).isFlinching = true;
                         }
                     }
                     hoofTouched = 0;
                     legTouchedFirst = 0;
                 }
 
-                // Reset flinch when animation done
                 if (flinchStarted)
                 {
-                    Debug.Log("FlinchLayer state: " + animator.GetCurrentAnimatorStateInfo(6).IsName("Idle")
-              + " flinchPlaying: " + flinchPlaying
-              + " normalizedTime: " + animator.GetCurrentAnimatorStateInfo(6).normalizedTime); 
                     if (!animator.GetCurrentAnimatorStateInfo(6).IsName("Idle"))
                     {
                         flinchPlaying = true;
@@ -176,12 +172,6 @@ public class HorseFsm : MonoBehaviour
                         animator.SetInteger("FlinchState", 0);
                         flinchStarted = false;
                         flinchPlaying = false;
-
-                        // Reset leg mover state
-                        for (int i = 1; i <= 4; i++)
-                        {
-                            GetLegMover(i).isFlinching = false;
-                        }
                     }
                 }
                 break;
@@ -222,22 +212,30 @@ public class HorseFsm : MonoBehaviour
 
                 if (touchedBehind)
                 {
-                    legRigWeight.ChangeWeight(0f);
-
-                    if (!kickStarted)
+                    // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
+                    if (!RumpTouchIsTrusted)
                     {
-                        animator.Play("Horse|kick_baked", 4, 0f);
-                        animator.SetLayerWeight(4, 1);
-                        kickStarted = true;
-                        hasKicked = true;
+                        legRigWeight.ChangeWeight(0f);
+
+                        if (!kickStarted)
+                        {
+                            animator.Play("Horse|kick_baked", 4, 0f);
+                            animator.SetLayerWeight(4, 1);
+                            kickStarted = true;
+                            hasKicked = true;
+                        }
+
+                        startAnxiousTimer = 1;
+
+                        if (animator.GetCurrentAnimatorStateInfo(4).normalizedTime >= 1f)
+                        {
+                            animator.SetLayerWeight(4, 0);
+                            legRigWeight.ChangeWeight(1f);
+                            kickStarted = false;
+                        }
                     }
-
-                    startAnxiousTimer = 1;
-
-                    if (animator.GetCurrentAnimatorStateInfo(4).normalizedTime >= 1f)
+                    else
                     {
-                        animator.SetLayerWeight(4, 0);
-                        legRigWeight.ChangeWeight(1f);
                         kickStarted = false;
                     }
                 }
@@ -265,6 +263,14 @@ public class HorseFsm : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    // ── Body-touch ref-count API (collègue) ──────────────────────────────────
+    public void NotifyBodyTouch(bool entering)
+    {
+        bodyTouchCount = Mathf.Max(0, bodyTouchCount + (entering ? 1 : -1));
+        lastBodyTouchTime = Time.time;
+        Debug.Log($"HorseFsm: body touch count={bodyTouchCount} at {Time.time}");
     }
 
     private void SwitchState(HorseStates newState)
@@ -307,11 +313,17 @@ public class HorseFsm : MonoBehaviour
         hasGreeted = false;
         hasKicked = false;
         kickStarted = false;
+        bodyTouchCount = 0;
+        lastBodyTouchTime = -999f;
+        flinchStarted = false;
+        flinchPlaying = false;
+        legTouchedFirst = 0;
+        hoofTouched = 0;
+        legPrepTimer = 0f;
 
         startFeedingTimer = 0f;
         exitFeedingTimer = 0f;
         startAnxiousTimer = 0f;
-
         HorseEmotion = 0f;
 
         for (int i = 1; i <= 6; i++)
@@ -324,71 +336,16 @@ public class HorseFsm : MonoBehaviour
         animator.Play("idle1_Baked", 0, 0f);
     }
 
-    public void SetHandNearMouth(bool handNearMouth)
-    {
-        this.handNearMouth = handNearMouth;
-    }
+    // ── Setters ──────────────────────────────────────────────────────────────
+    public void SetHandNearMouth(bool v) { handNearMouth = v; }
+    public void SetHandBehindEar(bool v) { handBehindEar = v; }
+    public void SetSideStepDone(bool v) { sideStepDone = v; }
+    public void SetTouchedBehind(bool v) { touchedBehind = v; }
+    public void SetStartHorseWalk(bool v) { startHorseWalk = v; }
+    public void SetTouchedHead(bool v) { touchedHead = v; }
+    public void SetSideTouched(int v) { detectSideTouched = v; }
 
-    public void SetHandBehindEar(bool handBehindEar)
-    {
-        this.handBehindEar = handBehindEar;
-    }
-
-    public void SetSideStepDone(bool sideStepDone)
-    {
-        this.sideStepDone = sideStepDone;
-    }
-
-    public void SetTouchedBehind(bool touchedBehind)
-    {
-        this.touchedBehind = touchedBehind;
-    }
-
-    public void SetStartHorseWalk(bool startHorseWalk)
-    {
-        this.startHorseWalk = startHorseWalk;
-    }
-
-    public void SetTouchedHead(bool touchedHead)
-    {
-        this.touchedHead = touchedHead;
-    }
-
-    public void SetSideTouched(int sideTouched)
-    {
-        this.detectSideTouched = sideTouched;
-    }
-
-    private void ChangeEarRotation(Quaternion rightRotation, Quaternion leftRotation)
-    {
-        float noise1 = Mathf.PerlinNoise(Time.time * twitchSpeed, 0f);
-        float angleOffset1 = (noise1 - 0.5f) * twitchAmount;
-        Quaternion twitch1 = Quaternion.Euler(angleOffset1, 0f, 0f);
-
-        rightEar.targetRotation = rightRotation * twitch1;
-        leftEar.targetRotation = leftRotation * twitch1;
-    }
-
-    public void OnGentlePet()
-    {
-        Debug.Log("gentle pet" + HorseEmotion);
-        HorseEmotion += 0.05f;
-    }
-
-    public void OnHarshTouch()
-    {
-        Debug.Log("bad pet" + HorseEmotion);
-        HorseEmotion -= 0.2f;
-        startAnxiousTimer -= 2;
-    }
-
-    public void OnDangerTouch()
-    {
-        Debug.Log("danger pet" + HorseEmotion);
-        HorseEmotion -= 0.4f;
-        startAnxiousTimer -= 2;
-    }
-
+    // ── Flinch setters (Khalis) ───────────────────────────────────────────────
     public void SetLegTouched(int legIndex)
     {
         Debug.Log("SetLegTouched called with: " + legIndex);
@@ -402,15 +359,17 @@ public class HorseFsm : MonoBehaviour
         hoofTouched = hoofIndex;
     }
 
-    private LegMover GetLegMover(int index)
+    private void ChangeEarRotation(Quaternion rightRotation, Quaternion leftRotation)
     {
-        switch (index)
-        {
-            case 1: return legMover1;
-            case 2: return legMover2;
-            case 3: return legMover3;
-            case 4: return legMover4;
-            default: return null;
-        }
+        float noise1 = Mathf.PerlinNoise(Time.time * twitchSpeed, 0f);
+        float angleOffset1 = (noise1 - 0.5f) * twitchAmount;
+        Quaternion twitch1 = Quaternion.Euler(angleOffset1, 0f, 0f);
+
+        rightEar.targetRotation = rightRotation * twitch1;
+        leftEar.targetRotation = leftRotation * twitch1;
     }
+
+    public void OnGentlePet() { HorseEmotion += 0.05f; }
+    public void OnHarshTouch() { HorseEmotion -= 0.2f; startAnxiousTimer -= 2; }
+    public void OnDangerTouch() { HorseEmotion -= 0.4f; startAnxiousTimer -= 2; }
 }

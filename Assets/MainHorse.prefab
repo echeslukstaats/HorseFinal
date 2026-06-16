@@ -929,6 +929,7 @@ GameObject:
   - component: {fileID: 2691445633286330510}
   - component: {fileID: 5247153401707030629}
   - component: {fileID: 3816063525707666742}
+  - component: {fileID: 6388881249821489478}
   m_Layer: 7
   m_Name: Body1Collider
   m_TagString: Untagged
@@ -1001,6 +1002,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6388881249821489478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3781476332254142054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 1
 --- !u!1 &4156897757152459882
 GameObject:
   m_ObjectHideFlags: 0
@@ -1081,8 +1096,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1236390368955380179}
   - component: {fileID: 9044033841906712103}
-  - component: {fileID: 8528677874252973671}
   - component: {fileID: 1232369831619199255}
+  - component: {fileID: 1529495009426138800}
   m_Layer: 7
   m_Name: BehindTrigger
   m_TagString: Untagged
@@ -1128,19 +1143,6 @@ CapsuleCollider:
   m_Height: 0.66
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8528677874252973671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4794884567717604575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 297a742a7027442469f3293d1bfe63bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BehindTrigger
-  horseFsm: {fileID: 5966868726367260697}
 --- !u!114 &1232369831619199255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1155,6 +1157,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HorsePettingScript
   horseFsm: {fileID: 5966868726367260697}
   petZoneType: 0
+--- !u!114 &1529495009426138800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4794884567717604575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 1
 --- !u!1 &5196537551731991058
 GameObject:
   m_ObjectHideFlags: 0
@@ -1585,6 +1601,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8327067008144761705}
   - component: {fileID: 3412889791254655940}
+  - component: {fileID: 4283185892891372164}
   m_Layer: 0
   m_Name: Body3Collider
   m_TagString: Untagged
@@ -1630,6 +1647,20 @@ CapsuleCollider:
   m_Height: 0.97
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4283185892891372164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6302561624527557131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
 --- !u!1 &6406970755872144151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1705,6 +1736,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7399505199819573639}
   - component: {fileID: 3916244299902929976}
+  - component: {fileID: 1996078349868786225}
   m_Layer: 7
   m_Name: Body2Collider
   m_TagString: Untagged
@@ -1750,6 +1782,20 @@ CapsuleCollider:
   m_Height: 0.88
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1996078349868786225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6859452315070580653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
 --- !u!1 &7559383240251854764
 GameObject:
   m_ObjectHideFlags: 0
@@ -2954,6 +3000,7 @@ MonoBehaviour:
   leftEar: {fileID: 1906821122179577475}
   legRigWeight: {fileID: 4730503773745391652}
   hasGreeted: 0
+  lastBodyTouchTime: -999
 --- !u!114 &2349232769212384044
 MonoBehaviour:
   m_ObjectHideFlags: 0
