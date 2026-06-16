@@ -1,0 +1,5 @@
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/2y5c2m4g/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/2y5c2m4g/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/2y5c2m4g/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/2y5c2m4g/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/.utmp/RelWithDebInfo/2y5c2m4g/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

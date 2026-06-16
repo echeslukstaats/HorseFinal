@@ -1,0 +1,5 @@
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/HorseFinal/.utmp/RelWithDebInfo/20712t4n/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/HorseFinal/.utmp/RelWithDebInfo/20712t4n/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/HorseFinal/.utmp/RelWithDebInfo/20712t4n/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/HorseFinal/.utmp/RelWithDebInfo/20712t4n/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/Khalis Rabehi/Documents/git/HorseFinal/HorseFinal/.utmp/RelWithDebInfo/20712t4n/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

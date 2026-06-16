@@ -1,0 +1,10 @@
+# ninja log v5
+44	2172	8026286397731162	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	211a2decc9f39b28
+36	2183	8026286397796487	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	4e2e3d5bc3ddb68b
+0	2226	8026286398338969	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	cd885f30f8135565
+54	2294	8026286399010814	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ca6b96ded957c736
+9	2367	8026286399760295	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	97e1df13abbf6567
+67	2547	8026286401587487	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	c39e23ae71d9b70
+27	2587	8026286401998166	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	6b46ebe1bb947da7
+18	2717	8026286403249324	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	313d22f4463d0985
+2717	2899	8026286405104502	C:/Users/Khalis Rabehi/Documents/git/HorseFinal/Horsemodelrender-Copy6 - Copy (2)/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2y5c2m4g/obj/arm64-v8a/libgame.so	30b1a00cdae2822d

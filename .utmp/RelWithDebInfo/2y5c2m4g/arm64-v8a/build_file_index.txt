@@ -1,0 +1,2 @@
+C:\Users\Khalis Rabehi\Documents\git\HorseFinal\Horsemodelrender-Copy6 - Copy (2)\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Users\Khalis Rabehi\Documents\git\HorseFinal\Horsemodelrender-Copy6 - Copy (2)\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt
