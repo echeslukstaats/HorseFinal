@@ -374,3 +374,20 @@ Builds/
 Logs/
 userSettings/
 *.DS_Store
+
+# Unity generated
+/Library/
+/Temp/
+/Logs/
+/build/
+/Builds/
+/UserSettings/
+/.utmp/
+
+# Visual Studio
+*.slnx
+*.sln
+*.csproj
+
+# Unity recovery
+Assets/_Recovery/
