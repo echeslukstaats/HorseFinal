@@ -8,6 +8,8 @@ public class HeadPetDetection : MonoBehaviour
     {
         if (other.CompareTag("VRHand"))
         {
+           horseFsm.NotifyZoneEnter(HorseFsm.BodyZone.Head);
+
            if(horseFsm.currState == HorseStates.None)
             {
                 if(horseFsm.hasGreeted == false)

@@ -63,7 +63,7 @@ public class HandTracking : MonoBehaviour
                 var legDetector = hit.collider.GetComponent<LegTouchDetector>();
                 if (legDetector != null)
                 {
-                    legDetector.NotifyTouched();
+                    legDetector.OnTouched();
                     continue;
                 }
 
@@ -72,7 +72,7 @@ public class HandTracking : MonoBehaviour
                 var behindTrigger = hit.collider.GetComponent<BehindTrigger>();
                 if (behindTrigger != null)
                 {
-                    behindTrigger.NotifyTouched();
+                    behindTrigger.OnTouched();
                 }
             }
         }

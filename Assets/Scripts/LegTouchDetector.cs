@@ -14,7 +14,31 @@ public class LegTouchDetector : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("VRHand")) return;
-        NotifyTouched();
+
+        OnTouched();
+    }
+
+    public void OnTouched()
+    {
+        HorseFsm.BodyZone zone = ZoneFromLeg(legIndex, isHoof);
+        bool continuous = horseFsm.NotifyZoneEnter(zone);
+
+        if (isHoof)
+            horseFsm.SetHoofTouched(legIndex, continuous);
+        else
+            horseFsm.SetLegTouched(legIndex);
+    }
+
+    private static HorseFsm.BodyZone ZoneFromLeg(int legIndex, bool isHoof)
+    {
+        switch (legIndex)
+        {
+            case 1: return isHoof ? HorseFsm.BodyZone.HoofFL : HorseFsm.BodyZone.LegFL;
+            case 2: return isHoof ? HorseFsm.BodyZone.HoofFR : HorseFsm.BodyZone.LegFR;
+            case 3: return isHoof ? HorseFsm.BodyZone.HoofBL : HorseFsm.BodyZone.LegBL;
+            case 4: return isHoof ? HorseFsm.BodyZone.HoofBR : HorseFsm.BodyZone.LegBR;
+            default: return HorseFsm.BodyZone.None;
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -22,14 +46,6 @@ public class LegTouchDetector : MonoBehaviour
         if (!other.CompareTag("VRHand")) return;
 
         if (isHoof)
-            horseFsm.SetHoofTouched(0); 
-    }
-
-    public void NotifyTouched()
-    {
-        if (isHoof)
-            horseFsm.SetHoofTouched(legIndex);
-        else
-            horseFsm.SetLegTouched(legIndex);
+            horseFsm.SetHoofTouched(0);
     }
 }

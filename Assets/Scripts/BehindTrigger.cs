@@ -15,4 +15,6 @@ public class BehindTrigger : MonoBehaviour
     }
 
     public void NotifyTouched() => horseFsm.SetTouchedBehind(true);
+
+    public void OnTouched() => NotifyTouched();
 }
