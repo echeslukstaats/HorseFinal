@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum HorseStates
 {
@@ -42,8 +43,9 @@ public class HorseFsm : MonoBehaviour
     public bool hasGreeted = false;
     private bool kickStarted = false;
 
-    // Ref-counted body touch — handles overlapping colliders cleanly.
-    // handOnBody is true as long as at least one body collider contains the hand.
+    // ── Body-touch ref-count  ──────────────────────────────────────
+    // Handles overlapping colliders cleanly; handOnBody is true as long as
+    // at least one body collider contains the hand.
     private int bodyTouchCount = 0;
     public bool handOnBody => bodyTouchCount > 0;
     public float lastBodyTouchTime = -999f;
@@ -59,6 +61,53 @@ public class HorseFsm : MonoBehaviour
         }
     }
 
+    // ── Flinch system ────────────────────────────────────────────────
+    private bool flinchStarted = false;
+    private bool flinchPlaying = false;
+    private int hoofTouched = 0;     // 0=none 1=FL 2=FR 3=BL 4=BR
+    private bool hoofWasTouched = false;
+    private bool hoofTouchWasContinuous = false;
+
+    // ── Body zone tracking ─────────────────────────────────────────
+    public enum BodyZone
+    {
+        None, Head, Body, Rump,
+        LegFL, HoofFL, LegFR, HoofFR, LegBL, HoofBL, LegBR, HoofBR
+    }
+
+    private BodyZone lastZoneTouched = BodyZone.None;
+    private float lastZoneTouchTime = -999f;
+    private const float ZONE_CONTINUITY_WINDOW = 1.5f;
+
+    private static readonly Dictionary<BodyZone, BodyZone[]> ZoneAdjacency = new Dictionary<BodyZone, BodyZone[]>
+    {
+        { BodyZone.Head,   new[] { BodyZone.Body } },
+        { BodyZone.Body,   new[] { BodyZone.Head, BodyZone.Rump, BodyZone.LegFL, BodyZone.LegFR } },
+        { BodyZone.Rump,   new[] { BodyZone.Body, BodyZone.LegBL, BodyZone.LegBR } },
+        { BodyZone.LegFL,  new[] { BodyZone.Body, BodyZone.HoofFL } },
+        { BodyZone.HoofFL, new[] { BodyZone.LegFL } },
+        { BodyZone.LegFR,  new[] { BodyZone.Body, BodyZone.HoofFR } },
+        { BodyZone.HoofFR, new[] { BodyZone.LegFR } },
+        { BodyZone.LegBL,  new[] { BodyZone.Rump, BodyZone.HoofBL } },
+        { BodyZone.HoofBL, new[] { BodyZone.LegBL } },
+        { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.HoofBR } },
+        { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
+    };
+
+    // Returns true if the new touch is considered a "continuous" interaction with the same body part
+    public bool NotifyZoneEnter(BodyZone zone)
+    {
+        bool continuous = lastZoneTouched != BodyZone.None
+            && ZoneAdjacency.TryGetValue(zone, out var neighbours)
+            && System.Array.IndexOf(neighbours, lastZoneTouched) >= 0
+            && (Time.time - lastZoneTouchTime) <= ZONE_CONTINUITY_WINDOW;
+
+        lastZoneTouched = zone;
+        lastZoneTouchTime = Time.time;
+
+        return continuous;
+    }
+
     private void Start()
     {
         animator.SetInteger("BehaviourStates", (int)currState);
@@ -66,6 +115,36 @@ public class HorseFsm : MonoBehaviour
 
     private void Update()
     {
+        bool hoofIsTouchedNow = hoofTouched != 0;
+
+        if (hoofIsTouchedNow && !hoofWasTouched)
+        {
+            if (!hoofTouchWasContinuous && !flinchStarted)
+            {
+                animator.SetInteger("FlinchState", hoofTouched);
+                animator.SetLayerWeight(6, 1);
+                flinchStarted = true;
+                flinchPlaying = false;
+            }
+        }
+
+        hoofWasTouched = hoofIsTouchedNow;
+
+        if (flinchStarted)
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(6).IsName("Idle"))
+            {
+                flinchPlaying = true;
+            }
+            else if (flinchPlaying)
+            {
+                animator.SetLayerWeight(6, 0);
+                animator.SetInteger("FlinchState", 0);
+                flinchStarted = false;
+                flinchPlaying = false;
+            }
+        }
+
         switch (currState)
         {
             case HorseStates.None:
@@ -89,6 +168,7 @@ public class HorseFsm : MonoBehaviour
                     startFeedingTimer = 0;
                 }
 
+                // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
                 if ((handBehindEar && !hasGreeted) || (touchedBehind && !RumpTouchIsTrusted))
                 {
                     HorseEmotion = -3f;
@@ -120,6 +200,7 @@ public class HorseFsm : MonoBehaviour
                     animator.SetInteger("BehaviourStates", (int)currState);
                     animator.SetLayerWeight(3, 1);
                 }
+
                 break;
 
             case HorseStates.Feeding:
@@ -158,6 +239,7 @@ public class HorseFsm : MonoBehaviour
 
                 if (touchedBehind)
                 {
+                    // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
                     if (!RumpTouchIsTrusted)
                     {
                         legRigWeight.ChangeWeight(0f);
@@ -210,6 +292,7 @@ public class HorseFsm : MonoBehaviour
         }
     }
 
+    // ── Body-touch ref-count API (collègue) ──────────────────────────────────
     public void NotifyBodyTouch(bool entering)
     {
         bodyTouchCount = Mathf.Max(0, bodyTouchCount + (entering ? 1 : -1));
@@ -259,13 +342,17 @@ public class HorseFsm : MonoBehaviour
         kickStarted = false;
         bodyTouchCount = 0;
         lastBodyTouchTime = -999f;
+        flinchStarted = false;
+        flinchPlaying = false;
+        hoofTouched = 0;
+        hoofTouchWasContinuous = false;
 
         startFeedingTimer = 0f;
         exitFeedingTimer = 0f;
         startAnxiousTimer = 0f;
         HorseEmotion = 0f;
 
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 6; i++)
             animator.SetLayerWeight(i, 0f);
 
         legRigWeight.ChangeWeight(1f);
@@ -273,8 +360,12 @@ public class HorseFsm : MonoBehaviour
         SwitchState(HorseStates.None);
         animator.SetInteger("BehaviourStates", (int)HorseStates.None);
         animator.Play("idle1_Baked", 0, 0f);
+        hoofWasTouched = false;
+        lastZoneTouched = BodyZone.None;
+        lastZoneTouchTime = -999f;
     }
 
+    // ── Setters ──────────────────────────────────────────────────────────────
     public void SetHandNearMouth(bool v) { handNearMouth = v; }
     public void SetHandBehindEar(bool v) { handBehindEar = v; }
     public void SetSideStepDone(bool v) { sideStepDone = v; }
@@ -282,6 +373,18 @@ public class HorseFsm : MonoBehaviour
     public void SetStartHorseWalk(bool v) { startHorseWalk = v; }
     public void SetTouchedHead(bool v) { touchedHead = v; }
     public void SetSideTouched(int v) { detectSideTouched = v; }
+
+    public void SetLegTouched(int legIndex)
+    {
+        Debug.Log("SetLegTouched called with: " + legIndex);
+    }
+
+    public void SetHoofTouched(int hoofIndex, bool cameFromContinuousCaress = false)
+    {
+        hoofTouched = hoofIndex;
+        if (hoofIndex != 0)
+            hoofTouchWasContinuous = cameFromContinuousCaress;
+    }
 
     private void ChangeEarRotation(Quaternion rightRotation, Quaternion leftRotation)
     {

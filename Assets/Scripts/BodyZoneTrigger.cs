@@ -11,6 +11,8 @@ public class BodyZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("VRHand")) return;
 
+        horseFsm.NotifyZoneEnter(isRump ? HorseFsm.BodyZone.Rump : HorseFsm.BodyZone.Body);
+
         if (isRump)
             horseFsm.SetTouchedBehind(true);
         else

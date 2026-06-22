@@ -26,8 +26,10 @@ public class LegMover : MonoBehaviour
 
     private bool initialFlinchDone = false;
     private float FlinchTimer = 0f;
-    private float FlinchDuration = 0.4f; 
+    private float FlinchDuration = 0.4f;
     private Vector3 FlinchOffset;
+
+    public bool isFlinching = false;
 
 
     public OVRHand leftOVRHand;
@@ -43,6 +45,8 @@ public class LegMover : MonoBehaviour
     private void Update()
     {
 
+        if (isFlinching) return; // Skip movement if flinching
+
         if (isGrabbed && leadHand != null)
         {
             if (!IsGripping(leadHand))
@@ -57,8 +61,8 @@ public class LegMover : MonoBehaviour
         else
         {
             ResetLeg();
-        }          
-        
+        }
+
     }
     private void OnTriggerStay(Collider other)
     {
@@ -66,7 +70,7 @@ public class LegMover : MonoBehaviour
         {
 
             if (IsGripping(other.transform))
-            {   
+            {
                 GrabLeg(other.transform);
             }
         }
@@ -76,7 +80,7 @@ public class LegMover : MonoBehaviour
         bool isLeft = handTransform.name.ToLower().Contains("left");
         bool isRight = handTransform.name.ToLower().Contains("right");
 
-    
+
         if (isLeft && leftOVRHand != null && leftOVRHand.IsTracked)
             return leftOVRHand.GetFingerIsPinching(OVRHand.HandFinger.Index);
 
@@ -104,9 +108,9 @@ public class LegMover : MonoBehaviour
     private void GrabLeg(Transform vrHand)
     {
         if (isGrabbed) return;
-        
+
         leadHand = vrHand;
-        isGrabbed=true;
+        isGrabbed = true;
         grabDifference = ikTarget.position - vrHand.position;
         initialHandRotation = vrHand.rotation;
 
@@ -139,7 +143,7 @@ public class LegMover : MonoBehaviour
         difference.x = Mathf.Clamp(difference.x, minX, maxX);
         difference.z = Mathf.Clamp(difference.z, minZ, maxZ);
 
-        
+
         ikTarget.position = ikRoot.position + difference;
         Vector3 finalPos = ikTarget.position;
         finalPos.y = Mathf.Clamp(ikTarget.position.y, 0, 0.6f);
@@ -157,17 +161,17 @@ public class LegMover : MonoBehaviour
         Quaternion liftQuat = Quaternion.identity;
 
         if (gameObject.name.Contains("FrontL"))
-        { 
-            liftQuat = Quaternion.Euler(-liftAngle,0f, 0f);
+        {
+            liftQuat = Quaternion.Euler(-liftAngle, 0f, 0f);
         }
-        else if (gameObject.name.Contains("Back") )
+        else if (gameObject.name.Contains("Back"))
         {
             liftQuat = Quaternion.Euler(liftAngle, 0f, 0f);
         }
 
         Quaternion finalRotation = liftQuat;
 
-   
+
         if (isGrabbed && leadHand != null)
         {
             Quaternion handOffset = leadHand.rotation * Quaternion.Inverse(initialHandRotation);

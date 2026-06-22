@@ -40,7 +40,10 @@ public class HorsePettingScript : MonoBehaviour
         Transform hand = other.transform;
 
         if (handsInside.Add(hand))
+        {
+            horseFsm.NotifyZoneEnter(HorseFsm.BodyZone.Body);
             horseFsm.NotifyBodyTouch(true);
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -54,7 +57,10 @@ public class HorsePettingScript : MonoBehaviour
         // Catch any hand that entered without firing OnTriggerEnter
         // (e.g. hand spawned inside the collider).
         if (handsInside.Add(hand))
+        {
+            horseFsm.NotifyZoneEnter(HorseFsm.BodyZone.Body);
             horseFsm.NotifyBodyTouch(true);
+        }
 
         if (!handHistory.ContainsKey(hand))
         {
