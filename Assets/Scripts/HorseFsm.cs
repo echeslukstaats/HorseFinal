@@ -65,6 +65,7 @@ public class HorseFsm : MonoBehaviour
     private bool flinchPlaying = false;
     private int legTouchedFirst = 0; // 0=none 1=FL 2=FR 3=BL 4=BR
     private int hoofTouched = 0;     // 0=none 1=FL 2=FR 3=BL 4=BR
+    private bool hoofWasTouched = false;
     private float legPrepTimer = 0f;
     private const float LEG_PREP_TIMOUT = 3f;
 
@@ -75,6 +76,54 @@ public class HorseFsm : MonoBehaviour
 
     private void Update()
     {
+        // Flinch runs independently of the current horse state.
+        if (legTouchedFirst != 0)
+        {
+            legPrepTimer += Time.deltaTime;
+            if (legPrepTimer >= LEG_PREP_TIMOUT)
+            {
+                legTouchedFirst = 0;
+                legPrepTimer = 0f;
+            }
+        }
+
+        bool hoofIsTouchedNow = hoofTouched != 0;
+
+        if (hoofIsTouchedNow && !hoofWasTouched)
+        {
+            Debug.Log("Hoof touched: " + hoofTouched + " legTouchedFirst: " + legTouchedFirst + " flinchStarted: " + flinchStarted);
+
+            bool cameFromLeg = (legTouchedFirst == hoofTouched);
+
+            if (!cameFromLeg && !flinchStarted)
+            {
+                animator.SetInteger("FlinchState", hoofTouched);
+                animator.SetLayerWeight(6, 1);
+                flinchStarted = true;
+                flinchPlaying = false;
+            }
+
+            legTouchedFirst = 0;
+            legPrepTimer = 0f;
+        }
+
+        hoofWasTouched = hoofIsTouchedNow;
+
+        if (flinchStarted)
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(6).IsName("Idle"))
+            {
+                flinchPlaying = true;
+            }
+            else if (flinchPlaying)
+            {
+                animator.SetLayerWeight(6, 0);
+                animator.SetInteger("FlinchState", 0);
+                flinchStarted = false;
+                flinchPlaying = false;
+            }
+        }
+
         switch (currState)
         {
             case HorseStates.None:
@@ -131,49 +180,6 @@ public class HorseFsm : MonoBehaviour
                     animator.SetLayerWeight(3, 1);
                 }
 
-                // ── Flinch system (Khalis) ────────────────────────────────────
-                if (legTouchedFirst != 0)
-                {
-                    legPrepTimer += Time.deltaTime;
-                    if (legPrepTimer >= LEG_PREP_TIMOUT)
-                    {
-                        legTouchedFirst = 0;
-                        legPrepTimer = 0f;
-                    }
-                }
-
-                if (hoofTouched != 0)
-                {
-                    Debug.Log("Hoof touched: " + hoofTouched + " legTouchedFirst: " + legTouchedFirst + " flinchStarted: " + flinchStarted);
-                    if (legTouchedFirst != hoofTouched)
-                    {
-                        Debug.Log("Triggering flinch on layer 6 with FlinchState: " + hoofTouched);
-                        if (!flinchStarted)
-                        {
-                            animator.SetInteger("FlinchState", hoofTouched);
-                            animator.SetLayerWeight(6, 1);
-                            flinchStarted = true;
-                            flinchPlaying = false;
-                        }
-                    }
-                    hoofTouched = 0;
-                    legTouchedFirst = 0;
-                }
-
-                if (flinchStarted)
-                {
-                    if (!animator.GetCurrentAnimatorStateInfo(6).IsName("Idle"))
-                    {
-                        flinchPlaying = true;
-                    }
-                    else if (flinchPlaying)
-                    {
-                        animator.SetLayerWeight(6, 0);
-                        animator.SetInteger("FlinchState", 0);
-                        flinchStarted = false;
-                        flinchPlaying = false;
-                    }
-                }
                 break;
 
             case HorseStates.Feeding:
@@ -334,6 +340,7 @@ public class HorseFsm : MonoBehaviour
         SwitchState(HorseStates.None);
         animator.SetInteger("BehaviourStates", (int)HorseStates.None);
         animator.Play("idle1_Baked", 0, 0f);
+        hoofWasTouched = false;
     }
 
     // ── Setters ──────────────────────────────────────────────────────────────

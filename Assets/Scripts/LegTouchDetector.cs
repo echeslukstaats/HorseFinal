@@ -14,18 +14,22 @@ public class LegTouchDetector : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("VRHand")) return;
-
-        if (isHoof)
-            horseFsm.SetHoofTouched(legIndex);
-        else
-            horseFsm.SetLegTouched(legIndex);
+        NotifyTouched();
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("VRHand")) return;
 
-        if (!isHoof)
-            horseFsm.SetLegTouched(0);
+        if (isHoof)
+            horseFsm.SetHoofTouched(0); 
+    }
+
+    public void NotifyTouched()
+    {
+        if (isHoof)
+            horseFsm.SetHoofTouched(legIndex);
+        else
+            horseFsm.SetLegTouched(legIndex);
     }
 }
