@@ -42,6 +42,18 @@ public class HorseFsm : MonoBehaviour
     private float HorseEmotion = 0f;
     public bool hasGreeted = false;
     private bool kickStarted = false;
+    private bool kickLocked = false;
+
+    // ── Per-leg kick targeting ─────────────────────────────────────────────
+    public int lastKickedLeg { get; private set; } = 0;
+    private const int DEFAULT_KICK_LEG = 4; // Back Right — fallback if no leg/hoof touch is on record
+
+    // Thigh-level touch (no hoof contact yet). Used as a secondary signal for
+    // DetermineKickLeg() when hoofTouched is 0. Expires after LEG_TOUCH_TIMEOUT
+    // so an old touch can't silently dictate a kick minutes later.
+    private int legTouched = 0; // 0=none 1=FL 2=FR 3=BL 4=BR
+    private float legTouchTimer = 0f;
+    private const float LEG_TOUCH_TIMEOUT = 3f;
 
     // ── Body-touch ref-count  ──────────────────────────────────────
     // Handles overlapping colliders cleanly; handOnBody is true as long as
@@ -115,6 +127,16 @@ public class HorseFsm : MonoBehaviour
 
     private void Update()
     {
+        if (legTouched != 0)
+        {
+            legTouchTimer += Time.deltaTime;
+            if (legTouchTimer >= LEG_TOUCH_TIMEOUT)
+            {
+                legTouched = 0;
+                legTouchTimer = 0f;
+            }
+        }
+
         bool hoofIsTouchedNow = hoofTouched != 0;
 
         if (hoofIsTouchedNow && !hoofWasTouched)
@@ -169,7 +191,7 @@ public class HorseFsm : MonoBehaviour
                 }
 
                 // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
-                if ((handBehindEar && !hasGreeted) || (touchedBehind && !RumpTouchIsTrusted))
+                if ((handBehindEar && !hasGreeted) || ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted))
                 {
                     HorseEmotion = -3f;
                     legRigWeight.ChangeWeight(0f);
@@ -237,29 +259,50 @@ public class HorseFsm : MonoBehaviour
 
                 startAnxiousTimer += Time.deltaTime;
 
-                if (touchedBehind)
+                if (touchedBehind || legTouched != 0)
                 {
                     // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
                     if (!RumpTouchIsTrusted)
                     {
                         legRigWeight.ChangeWeight(0f);
 
-                        if (!kickStarted)
+                        if (!kickStarted && !kickLocked)
                         {
-                            animator.Play("Horse|kick_baked", 4, 0f);
+                            Debug.Log($"[KICK] Starting kick — hoofTouched={hoofTouched} legTouched={legTouched}");
+                            int kickLeg = DetermineKickLeg();
+                            Debug.Log($"[KICK] DetermineKickLeg() returned {kickLeg}");
+                            FireKickTrigger(kickLeg);
+                            lastKickedLeg = kickLeg;
                             animator.SetLayerWeight(4, 1);
                             kickStarted = true;
+                            kickLocked = true;
                             hasKicked = true;
+                            Debug.Log($"[KICK] Layer 4 weight set to 1. Current state on layer 4: {animator.GetCurrentAnimatorStateInfo(4).fullPathHash}");
                         }
-
-                        startAnxiousTimer = 1;
-
-                        if (animator.GetCurrentAnimatorStateInfo(4).normalizedTime >= 1f)
+                        /*
+                        else if (kickStarted && animator.GetCurrentAnimatorStateInfo(4).normalizedTime >= 1f)
                         {
+                            Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
                             animator.SetLayerWeight(4, 0);
                             legRigWeight.ChangeWeight(1f);
                             kickStarted = false;
+                            lastKickedLeg = 0;
+                        }*/
+                        else if (kickStarted)
+                        {
+                            var info = animator.GetCurrentAnimatorStateInfo(4);
+                            Debug.Log($"[KICK-DEBUG] hash={info.fullPathHash} length={info.length:F3}s normalizedTime={info.normalizedTime:F3} speed={info.speed:F2}");
+
+                            if (info.normalizedTime >= 1f)
+                            {
+                                Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
+                                animator.SetLayerWeight(4, 0);
+                                legRigWeight.ChangeWeight(1f);
+                                kickStarted = false;
+                                lastKickedLeg = 0;
+                            }
                         }
+                        startAnxiousTimer = 1;
                     }
                     else
                     {
@@ -269,6 +312,7 @@ public class HorseFsm : MonoBehaviour
                 else
                 {
                     kickStarted = false;
+                    kickLocked = false;
                 }
 
                 if (startAnxiousTimer >= 40f || HorseEmotion > 0)
@@ -298,6 +342,37 @@ public class HorseFsm : MonoBehaviour
         bodyTouchCount = Mathf.Max(0, bodyTouchCount + (entering ? 1 : -1));
         lastBodyTouchTime = Time.time;
         Debug.Log($"HorseFsm: body touch count={bodyTouchCount} at {Time.time}");
+    }
+
+    // ── Per-leg kick targeting ─────────────────────────────────────────────
+    // Picks which leg should perform the kick. hoofTouched is preferred since
+    // it reflects the leg currently being held at the hoof; legTouched covers
+    // the case where the hand is on the thigh (prep phase) but hasn't reached
+    // the hoof. Falls back to DEFAULT_KICK_LEG if neither is set (e.g. kick
+    // triggered purely from a rump touch with no leg contact at all).
+    private int DetermineKickLeg()
+    {
+        if (hoofTouched != 0) return hoofTouched;
+        if (legTouched != 0) return legTouched;
+        return DEFAULT_KICK_LEG;
+    }
+
+    // Fires the Animator trigger matching legIndex (1=FL, 2=FR, 3=BL, 4=BR).
+    // Trigger names must match the 4 kick states on the Animator Controller's
+    // kick layer (layer 4).
+    private void FireKickTrigger(int legIndex)
+    {
+        string triggerName;
+        switch (legIndex)
+        {
+            case 1: triggerName = "KickFrontLeft"; break;
+            case 2: triggerName = "KickFrontRight"; break;
+            case 3: triggerName = "KickBackLeft"; break;
+            case 4: triggerName = "KickBackRight"; break;
+            default: triggerName = "KickBackRight"; break;
+        }
+        Debug.Log($"[KICK] Firing trigger: {triggerName} (legIndex={legIndex})");
+        animator.SetTrigger(triggerName);
     }
 
     private void SwitchState(HorseStates newState)
@@ -340,12 +415,16 @@ public class HorseFsm : MonoBehaviour
         hasGreeted = false;
         hasKicked = false;
         kickStarted = false;
+        kickLocked = false;
         bodyTouchCount = 0;
         lastBodyTouchTime = -999f;
         flinchStarted = false;
         flinchPlaying = false;
         hoofTouched = 0;
         hoofTouchWasContinuous = false;
+        legTouched = 0;
+        legTouchTimer = 0f;
+        lastKickedLeg = 0;
 
         startFeedingTimer = 0f;
         exitFeedingTimer = 0f;
@@ -354,6 +433,11 @@ public class HorseFsm : MonoBehaviour
 
         for (int i = 1; i <= 6; i++)
             animator.SetLayerWeight(i, 0f);
+
+        animator.ResetTrigger("KickFrontLeft");
+        animator.ResetTrigger("KickFrontRight");
+        animator.ResetTrigger("KickBackLeft");
+        animator.ResetTrigger("KickBackRight");
 
         legRigWeight.ChangeWeight(1f);
 
@@ -376,11 +460,14 @@ public class HorseFsm : MonoBehaviour
 
     public void SetLegTouched(int legIndex)
     {
-        Debug.Log("SetLegTouched called with: " + legIndex);
+        Debug.Log($"[KICK] SetLegTouched called with: {legIndex}");
+        legTouched = legIndex;
+        legTouchTimer = 0f;
     }
 
     public void SetHoofTouched(int hoofIndex, bool cameFromContinuousCaress = false)
     {
+        Debug.Log($"[KICK] SetHoofTouched called with: {hoofIndex} (continuous={cameFromContinuousCaress})");
         hoofTouched = hoofIndex;
         if (hoofIndex != 0)
             hoofTouchWasContinuous = cameFromContinuousCaress;
