@@ -80,6 +80,14 @@ public class HorseFsm : MonoBehaviour
     private bool hoofWasTouched = false;
     private bool hoofTouchWasContinuous = false;
 
+    // ── Continuous pet kick system ────────────────────────────────────────────────
+    private bool touchedBehindWasContinuous = false;
+    private bool legTouchWasContinuous = false;
+
+    private bool TouchIsSafe =>
+        (touchedBehind && touchedBehindWasContinuous) ||
+        (legTouched != 0 && legTouchWasContinuous);
+
     // ── Body zone tracking ─────────────────────────────────────────
     public enum BodyZone
     {
@@ -106,13 +114,28 @@ public class HorseFsm : MonoBehaviour
         { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
     };
 
+    public void RefreshZoneTime(BodyZone zone)
+    {
+        if (zone == lastZoneTouched)
+            lastZoneTouchTime = Time.time;
+    }
+
     // Returns true if the new touch is considered a "continuous" interaction with the same body part
     public bool NotifyZoneEnter(BodyZone zone)
     {
-        bool continuous = lastZoneTouched != BodyZone.None
+        float elapsed = Time.time - lastZoneTouchTime;
+
+        // Re-entering the same zone should stay continuous within the time window,
+        // even when multiple colliders fire enter events while the hand remains in place.
+        bool sameZone = zone == lastZoneTouched && elapsed <= ZONE_CONTINUITY_WINDOW;
+
+        bool continuous = sameZone
+            || (lastZoneTouched != BodyZone.None
             && ZoneAdjacency.TryGetValue(zone, out var neighbours)
             && System.Array.IndexOf(neighbours, lastZoneTouched) >= 0
-            && (Time.time - lastZoneTouchTime) <= ZONE_CONTINUITY_WINDOW;
+            && elapsed <= ZONE_CONTINUITY_WINDOW);
+
+        Debug.Log($"[ZONE] Enter={zone} | Previous={lastZoneTouched} | Elapsed={elapsed:F2}s (max {ZONE_CONTINUITY_WINDOW}s) | SameZone={sameZone} | Continuous={continuous}");
 
         lastZoneTouched = zone;
         lastZoneTouchTime = Time.time;
@@ -191,7 +214,7 @@ public class HorseFsm : MonoBehaviour
                 }
 
                 // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
-                if ((handBehindEar && !hasGreeted) || ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted))
+                if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe)
                 {
                     HorseEmotion = -3f;
                     legRigWeight.ChangeWeight(0f);
@@ -261,8 +284,9 @@ public class HorseFsm : MonoBehaviour
 
                 if (touchedBehind || legTouched != 0)
                 {
+                    Debug.Log($"[KICK-GATE] touchedBehind={touchedBehind} (continuous={touchedBehindWasContinuous}) | legTouched={legTouched} (continuous={legTouchWasContinuous}) | RumpTouchIsTrusted={RumpTouchIsTrusted} | TouchIsSafe={TouchIsSafe}");
                     // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
-                    if (!RumpTouchIsTrusted)
+                    if (!RumpTouchIsTrusted && !TouchIsSafe)
                     {
                         legRigWeight.ChangeWeight(0f);
 
@@ -320,6 +344,7 @@ public class HorseFsm : MonoBehaviour
                     legRigWeight.ChangeWeight(1f);
                     animator.SetLayerWeight(4, 0);
                     kickStarted = false;
+                    kickLocked = false;
                     SwitchState(HorseStates.None);
                     animator.SetInteger("BehaviourStates", (int)currState);
                 }
@@ -422,6 +447,8 @@ public class HorseFsm : MonoBehaviour
         flinchPlaying = false;
         hoofTouched = 0;
         hoofTouchWasContinuous = false;
+        touchedBehindWasContinuous = false;
+        legTouchWasContinuous = false;
         legTouched = 0;
         legTouchTimer = 0f;
         lastKickedLeg = 0;
@@ -453,16 +480,21 @@ public class HorseFsm : MonoBehaviour
     public void SetHandNearMouth(bool v) { handNearMouth = v; }
     public void SetHandBehindEar(bool v) { handBehindEar = v; }
     public void SetSideStepDone(bool v) { sideStepDone = v; }
-    public void SetTouchedBehind(bool v) { touchedBehind = v; }
+    public void SetTouchedBehind(bool v, bool cameFromContinuousCaress = false)
+    {
+        touchedBehind = v;
+        if (v) touchedBehindWasContinuous = cameFromContinuousCaress;
+    }
     public void SetStartHorseWalk(bool v) { startHorseWalk = v; }
     public void SetTouchedHead(bool v) { touchedHead = v; }
     public void SetSideTouched(int v) { detectSideTouched = v; }
 
-    public void SetLegTouched(int legIndex)
+    public void SetLegTouched(int legIndex, bool cameFromContinuousCaress = false)
     {
         Debug.Log($"[KICK] SetLegTouched called with: {legIndex}");
         legTouched = legIndex;
         legTouchTimer = 0f;
+        if (legIndex != 0) legTouchWasContinuous = cameFromContinuousCaress;
     }
 
     public void SetHoofTouched(int hoofIndex, bool cameFromContinuousCaress = false)
