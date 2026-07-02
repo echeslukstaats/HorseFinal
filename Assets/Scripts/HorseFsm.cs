@@ -120,6 +120,23 @@ public class HorseFsm : MonoBehaviour
     {
         if (zone == lastZoneTouched)
             lastZoneTouchTime = Time.time;
+
+        // Keep touch timers alive while the hand remains inside the trigger.
+        switch (zone)
+        {
+            case BodyZone.LegFL:
+            case BodyZone.LegFR:
+            case BodyZone.LegBL:
+            case BodyZone.LegBR:
+                if (legTouched != 0) legTouchTimer = 0f;
+                break;
+            case BodyZone.HoofFL:
+            case BodyZone.HoofFR:
+            case BodyZone.HoofBL:
+            case BodyZone.HoofBR:
+                if (hoofTouched != 0) hoofTouchTimer = 0f;
+                break;
+        }
     }
 
     // Returns true if the new touch is considered a "continuous" interaction with the same body part
