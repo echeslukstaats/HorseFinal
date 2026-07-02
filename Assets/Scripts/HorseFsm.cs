@@ -54,6 +54,8 @@ public class HorseFsm : MonoBehaviour
     private int legTouched = 0; // 0=none 1=FL 2=FR 3=BL 4=BR
     private float legTouchTimer = 0f;
     private const float LEG_TOUCH_TIMEOUT = 3f;
+    private float hoofTouchTimer = 0f;
+    private const float HOOF_TOUCH_TIMEOUT = 3f;
 
     // ── Body-touch ref-count  ──────────────────────────────────────
     // Handles overlapping colliders cleanly; handOnBody is true as long as
@@ -102,18 +104,18 @@ public class HorseFsm : MonoBehaviour
     private static readonly Dictionary<BodyZone, BodyZone[]> ZoneAdjacency = new Dictionary<BodyZone, BodyZone[]>
     {
         { BodyZone.Head,   new[] { BodyZone.Body } },
-        { BodyZone.Body,   new[] { BodyZone.Head, BodyZone.Rump, BodyZone.LegFL, BodyZone.LegFR } },
+        { BodyZone.Body,   new[] { BodyZone.Head, BodyZone.Rump, BodyZone.LegFL, BodyZone.LegFR, BodyZone.LegBL, BodyZone.LegBR } },
         { BodyZone.Rump,   new[] { BodyZone.Body, BodyZone.LegBL, BodyZone.LegBR } },
         { BodyZone.LegFL,  new[] { BodyZone.Body, BodyZone.HoofFL } },
         { BodyZone.HoofFL, new[] { BodyZone.LegFL } },
         { BodyZone.LegFR,  new[] { BodyZone.Body, BodyZone.HoofFR } },
         { BodyZone.HoofFR, new[] { BodyZone.LegFR } },
-        { BodyZone.LegBL,  new[] { BodyZone.Rump, BodyZone.HoofBL } },
+        { BodyZone.LegBL,  new[] { BodyZone.Rump, BodyZone.Body, BodyZone.HoofBL } },
         { BodyZone.HoofBL, new[] { BodyZone.LegBL } },
-        { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.HoofBR } },
+        { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.Body, BodyZone.HoofBR } },
         { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
     };
-
+    
     public void RefreshZoneTime(BodyZone zone)
     {
         if (zone == lastZoneTouched)
@@ -157,6 +159,16 @@ public class HorseFsm : MonoBehaviour
             {
                 legTouched = 0;
                 legTouchTimer = 0f;
+            }
+        }
+
+        if (hoofTouched != 0)
+        {
+            hoofTouchTimer += Time.deltaTime;
+            if (hoofTouchTimer >= HOOF_TOUCH_TIMEOUT)
+            {
+                hoofTouched = 0;
+                hoofTouchTimer = 0f;
             }
         }
 
@@ -446,6 +458,7 @@ public class HorseFsm : MonoBehaviour
         flinchStarted = false;
         flinchPlaying = false;
         hoofTouched = 0;
+        hoofTouchTimer = 0f;
         hoofTouchWasContinuous = false;
         touchedBehindWasContinuous = false;
         legTouchWasContinuous = false;
@@ -501,6 +514,7 @@ public class HorseFsm : MonoBehaviour
     {
         Debug.Log($"[KICK] SetHoofTouched called with: {hoofIndex} (continuous={cameFromContinuousCaress})");
         hoofTouched = hoofIndex;
+        hoofTouchTimer = 0f;
         if (hoofIndex != 0)
             hoofTouchWasContinuous = cameFromContinuousCaress;
     }
