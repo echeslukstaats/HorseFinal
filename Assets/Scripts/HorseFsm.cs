@@ -344,7 +344,6 @@ public class HorseFsm : MonoBehaviour
                         else if (kickStarted)
                         {
                             var info = animator.GetCurrentAnimatorStateInfo(4);
-                            Debug.Log($"[KICK-DEBUG] hash={info.fullPathHash} length={info.length:F3}s normalizedTime={info.normalizedTime:F3} speed={info.speed:F2}");
 
                             if (info.normalizedTime >= 1f)
                             {
