@@ -199,6 +199,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandTracking
   trackedHand: {fileID: 2052947895}
   gizmoColor: {r: 0, g: 1, b: 0, a: 0.3}
+  sweepLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!135 &84397856
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -798,6 +801,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 741709082}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &240023427 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7987080183386733142, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+  m_PrefabInstance: {fileID: 1034159828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &240023431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240023427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 871611675}
+  isRump: 0
 --- !u!1 &257810521
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,6 +958,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8793d780cef63f74cb742a87ef39be7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LegMover
+--- !u!1 &269402649 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4156897757152459882, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+  m_PrefabInstance: {fileID: 1034159828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &269402653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269402649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 871611675}
+  isRump: 0
 --- !u!1 &289012371
 GameObject:
   m_ObjectHideFlags: 0
@@ -1563,6 +1604,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandTracking
   trackedHand: {fileID: 1262060745}
   gizmoColor: {r: 0, g: 1, b: 0, a: 0.3}
+  sweepLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!135 &606975805
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1689,6 +1733,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5030734267259534325, guid: e2698219e3231e94c8765d49b9dd5cff, type: 3}
   m_PrefabInstance: {fileID: 611616339}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &697325936 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1545471351792511769, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+  m_PrefabInstance: {fileID: 1034159828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &697325940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697325936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 871611675}
+  isRump: 0
 --- !u!1 &720218915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1826,6 +1889,25 @@ MonoBehaviour:
   autoDetect: 0
   completionCondition: 0
   horseFsm: {fileID: 871611675}
+--- !u!1 &796730965 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5196537551731991058, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+  m_PrefabInstance: {fileID: 1034159828}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &796730969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796730965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 871611675}
+  isRump: 0
 --- !u!1 &819719595
 GameObject:
   m_ObjectHideFlags: 0
@@ -2867,6 +2949,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0.0000006763025
       objectReference: {fileID: 0}
+    - target: {fileID: 7987080183386733142, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8035416867239858345, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -1.3951831
@@ -3018,7 +3104,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7987080183386733142, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 240023431}
+    - targetCorrespondingSourceObject: {fileID: 4156897757152459882, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 269402653}
+    - targetCorrespondingSourceObject: {fileID: 5196537551731991058, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 796730969}
+    - targetCorrespondingSourceObject: {fileID: 1545471351792511769, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 697325940}
   m_SourcePrefab: {fileID: 100100000, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
 --- !u!1 &1064099521
 GameObject:
