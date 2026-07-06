@@ -93,7 +93,7 @@ public class HorseFsm : MonoBehaviour
     // ── Body zone tracking ─────────────────────────────────────────
     public enum BodyZone
     {
-        None, Head, Body, Rump,
+        None, Head, Neck, Body, Rump,
         LegFL, HoofFL, LegFR, HoofFR, LegBL, HoofBL, LegBR, HoofBR
     }
 
@@ -103,8 +103,9 @@ public class HorseFsm : MonoBehaviour
 
     private static readonly Dictionary<BodyZone, BodyZone[]> ZoneAdjacency = new Dictionary<BodyZone, BodyZone[]>
     {
-        { BodyZone.Head,   new[] { BodyZone.Body } },
-        { BodyZone.Body,   new[] { BodyZone.Head, BodyZone.Rump, BodyZone.LegFL, BodyZone.LegFR, BodyZone.LegBL, BodyZone.LegBR } },
+        { BodyZone.Head,   new[] { BodyZone.Body, BodyZone.Neck } },
+        { BodyZone.Neck,   new[] { BodyZone.Head, BodyZone.Body } },
+        { BodyZone.Body,   new[] { BodyZone.Head, BodyZone.Neck, BodyZone.Rump, BodyZone.LegFL, BodyZone.LegFR, BodyZone.LegBL, BodyZone.LegBR } },
         { BodyZone.Rump,   new[] { BodyZone.Body, BodyZone.LegBL, BodyZone.LegBR } },
         { BodyZone.LegFL,  new[] { BodyZone.Body, BodyZone.HoofFL } },
         { BodyZone.HoofFL, new[] { BodyZone.LegFL } },
@@ -115,7 +116,13 @@ public class HorseFsm : MonoBehaviour
         { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.Body, BodyZone.HoofBR } },
         { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
     };
-    
+
+    public enum EmotionalState { Neutral, Happy, Anxious }
+    public EmotionalState emotionalState { get; private set; } = EmotionalState.Neutral;
+    private string firstTouchZone = null;
+    private const int EARS_LAYER = 7;
+
+
     public void RefreshZoneTime(BodyZone zone)
     {
         if (zone == lastZoneTouched)
@@ -144,8 +151,6 @@ public class HorseFsm : MonoBehaviour
     {
         float elapsed = Time.time - lastZoneTouchTime;
 
-        // Re-entering the same zone should stay continuous within the time window,
-        // even when multiple colliders fire enter events while the hand remains in place.
         bool sameZone = zone == lastZoneTouched && elapsed <= ZONE_CONTINUITY_WINDOW;
 
         bool continuous = sameZone
@@ -156,10 +161,62 @@ public class HorseFsm : MonoBehaviour
 
         Debug.Log($"[ZONE] Enter={zone} | Previous={lastZoneTouched} | Elapsed={elapsed:F2}s (max {ZONE_CONTINUITY_WINDOW}s) | SameZone={sameZone} | Continuous={continuous}");
 
+        // ── Emotional gating  ─────────────
+        UpdateEmotionalState(zone, continuous);
+
         lastZoneTouched = zone;
         lastZoneTouchTime = Time.time;
 
         return continuous;
+    }
+
+    private void UpdateEmotionalState(BodyZone zone, bool continuous)
+    {
+        if (!continuous)
+        {
+            firstTouchZone = zone.ToString();
+            emotionalState = (zone == BodyZone.Neck) ? EmotionalState.Happy : EmotionalState.Anxious;
+
+            Debug.Log($"[EMOTION-STATE] {emotionalState} triggered from {firstTouchZone} | t={Time.time:F2}s | gating reset");
+
+            if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
+            else TriggerEarsAnxious();
+        }
+        else
+        {
+            // Continuity holds: the state persists no matter which adjacent zone the
+            // hand is now on. This is what lets cross-zone petting (Neck → Body →
+            // Neck) keep the horse Happy without re-triggering the gate.
+            Debug.Log($"[EMOTION-STATE] {emotionalState} persists (continuous touch, now on {zone}) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
+        }
+    }
+
+    public void TriggerEarsHappy()
+    {
+        animator.SetBool("isHappy", true);
+        animator.SetBool("isAnxious", false);
+        animator.SetLayerWeight(EARS_LAYER, 1f);
+        Debug.Log($"[EMOTION-STATE] TriggerEarsHappy() — isHappy=true isAnxious=false layer{EARS_LAYER}.weight=1 | t={Time.time:F2}s");
+    }
+
+    public void TriggerEarsAnxious()
+    {
+        animator.SetBool("isAnxious", true);
+        animator.SetBool("isHappy", false);
+        animator.SetLayerWeight(EARS_LAYER, 1f);
+        Debug.Log($"[EMOTION-STATE] TriggerEarsAnxious() — isAnxious=true isHappy=false layer{EARS_LAYER}.weight=1 | t={Time.time:F2}s");
+    }
+
+    private void ResetEmotionalStateToNeutral()
+    {
+        if (emotionalState == EmotionalState.Neutral) return; // avoid log spam every frame
+
+        emotionalState = EmotionalState.Neutral;
+        firstTouchZone = null;
+        animator.SetBool("isHappy", false);
+        animator.SetBool("isAnxious", false);
+        animator.SetLayerWeight(EARS_LAYER, 0f);
+        Debug.Log($"[EMOTION-STATE] Neutral (idle, no active contact) | t={Time.time:F2}s");
     }
 
     private void Start()
@@ -217,6 +274,13 @@ public class HorseFsm : MonoBehaviour
                 flinchStarted = false;
                 flinchPlaying = false;
             }
+        }
+
+        if (lastZoneTouched != BodyZone.None
+            && Time.time - lastZoneTouchTime > ZONE_CONTINUITY_WINDOW)
+        {
+            ResetEmotionalStateToNeutral();
+            lastZoneTouched = BodyZone.None; 
         }
 
         switch (currState)
@@ -503,6 +567,13 @@ public class HorseFsm : MonoBehaviour
         hoofWasTouched = false;
         lastZoneTouched = BodyZone.None;
         lastZoneTouchTime = -999f;
+
+        // horse emotion reset
+        emotionalState = EmotionalState.Neutral;
+        firstTouchZone = null;
+        animator.SetBool("isHappy", false);
+        animator.SetBool("isAnxious", false);
+        animator.SetLayerWeight(EARS_LAYER, 0f);
     }
 
     // ── Setters ──────────────────────────────────────────────────────────────
