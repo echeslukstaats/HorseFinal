@@ -287,7 +287,10 @@ public class HorseFsm : MonoBehaviour
         {
             case HorseStates.None:
 
-                ChangeEarRotation(Quaternion.identity, Quaternion.identity);
+                // Ne pilote les oreilles par physique que si aucune couche emotionnelle
+                // n'est active, pour eviter un conflit avec le layer 7 (Ears Animator).
+                if (emotionalState == EmotionalState.Neutral)
+                    ChangeEarRotation(Quaternion.identity, Quaternion.identity);
 
                 if (handNearMouth)
                 {
@@ -355,7 +358,8 @@ public class HorseFsm : MonoBehaviour
 
             case HorseStates.Anxious:
 
-                ChangeEarRotation(Quaternion.Euler(rEarRotation), Quaternion.Euler(lEarRotation));
+                if (emotionalState == EmotionalState.Neutral)
+                    ChangeEarRotation(Quaternion.Euler(rEarRotation), Quaternion.Euler(lEarRotation));
 
                 AnimatorStateInfo animatorInfo = animator.GetCurrentAnimatorStateInfo(0);
 
