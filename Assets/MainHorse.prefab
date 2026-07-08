@@ -2164,7 +2164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
-  isNeck: 0
+  isNeck: 1
 --- !u!1 &8041758293179160618
 GameObject:
   m_ObjectHideFlags: 0
