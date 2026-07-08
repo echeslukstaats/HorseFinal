@@ -94,7 +94,8 @@ public class HorseFsm : MonoBehaviour
     public enum BodyZone
     {
         None, Head, Neck, Body, Rump,
-        LegFL, HoofFL, LegFR, HoofFR, LegBL, HoofBL, LegBR, HoofBR
+        LegFL, HoofFL, LegFR, HoofFR, LegBL, HoofBL, LegBR, HoofBR,
+        RearApproach
     }
 
     private BodyZone lastZoneTouched = BodyZone.None;
@@ -115,6 +116,7 @@ public class HorseFsm : MonoBehaviour
         { BodyZone.HoofBL, new[] { BodyZone.LegBL } },
         { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.Body, BodyZone.HoofBR } },
         { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
+        { BodyZone.RearApproach, new[] { BodyZone.Rump, BodyZone.Body } },
     };
 
     public enum EmotionalState { Neutral, Happy, Anxious }
@@ -192,7 +194,6 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
 
     if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
     else TriggerEarsAnxious();
-}
     }
 
     public void TriggerEarsHappy()
@@ -480,6 +481,32 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
         if (hoofTouched != 0) return hoofTouched;
         if (legTouched != 0) return legTouched;
         return DEFAULT_KICK_LEG;
+    }
+
+    // ── Rear-approach immediate kick (no state gating) ──────────────────────
+    // Called directly by BodyZoneTrigger when a hand enters the RearApproach
+    // zone. Deliberately bypasses hasGreeted, RumpTouchIsTrusted and
+    // TouchIsSafe — the only thing that can still block this kick is the
+    // existing kickStarted/kickLocked cooldown. Forcing SwitchState(Anxious)
+    // means the end-of-kick reset already handled in the Anxious block of
+    // Update() (normalizedTime >= 1f on layer 4) applies unchanged, so no
+    // reset logic is duplicated here.
+    public void TriggerImmediateKick()
+    {
+        Debug.Log($"[KICK] TriggerImmediateKick() called from RearApproach zone | kickLocked={kickLocked} kickStarted={kickStarted} | t={Time.time:F2}s");
+
+        if (kickStarted || kickLocked) return;
+
+        legRigWeight.ChangeWeight(0f);
+        SwitchState(HorseStates.Anxious);
+        animator.SetInteger("BehaviourStates", (int)currState);
+        int kickLeg = DetermineKickLeg();
+        FireKickTrigger(kickLeg);
+        lastKickedLeg = kickLeg;
+        animator.SetLayerWeight(4, 1);
+        kickStarted = true;
+        kickLocked = true;
+        hasKicked = true;
     }
 
     // Fires the Animator trigger matching legIndex (1=FL, 2=FR, 3=BL, 4=BR).
