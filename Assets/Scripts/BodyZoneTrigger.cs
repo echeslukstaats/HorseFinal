@@ -26,7 +26,8 @@ public class BodyZoneTrigger : MonoBehaviour
         // [DEBUG] Identifies exactly which GameObject/collider fired, since several
         // colliders can all resolve to the same zone (e.g. Body). Remove once the
         // neck-race issue is confirmed fixed.
-        Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}) | t={Time.time:F2}s");
+        if (Debug.isDebugBuild)
+            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}) | t={Time.time:F2}s");
 
         bool continuous = horseFsm.NotifyZoneEnter(zone);
 
