@@ -170,25 +170,29 @@ public class HorseFsm : MonoBehaviour
         return continuous;
     }
 
-    private void UpdateEmotionalState(BodyZone zone, bool continuous)
+private void UpdateEmotionalState(BodyZone zone, bool continuous)
+{
+    if (continuous)
+        return;
+
+    bool isFirstTouch = lastZoneTouched == BodyZone.None;
+
+    if (isFirstTouch)
     {
-        if (!continuous)
-        {
-            firstTouchZone = zone.ToString();
-            emotionalState = (zone == BodyZone.Neck) ? EmotionalState.Happy : EmotionalState.Anxious;
+        firstTouchZone = zone.ToString();
+        emotionalState = (zone == BodyZone.Neck) ? EmotionalState.Happy : EmotionalState.Anxious;
+        Debug.Log($"[EMOTION-STATE] {emotionalState} triggered from {firstTouchZone} | t={Time.time:F2}s | first touch");
+    }
+    else
+    {
+        // Continuity chain broken: always anxious per gating rules.
+        emotionalState = EmotionalState.Anxious;
+        Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
+    }
 
-            Debug.Log($"[EMOTION-STATE] {emotionalState} triggered from {firstTouchZone} | t={Time.time:F2}s | gating reset");
-
-            if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
-            else TriggerEarsAnxious();
-        }
-        else
-        {
-            // Continuity holds: the state persists no matter which adjacent zone the
-            // hand is now on. This is what lets cross-zone petting (Neck → Body →
-            // Neck) keep the horse Happy without re-triggering the gate.
-            Debug.Log($"[EMOTION-STATE] {emotionalState} persists (continuous touch, now on {zone}) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
-        }
+    if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
+    else TriggerEarsAnxious();
+}
     }
 
     public void TriggerEarsHappy()
