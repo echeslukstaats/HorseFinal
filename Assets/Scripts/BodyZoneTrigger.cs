@@ -21,7 +21,14 @@ public class BodyZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("VRHand")) return;
 
-        bool continuous = horseFsm.NotifyZoneEnter(ResolveZone());
+        var zone = ResolveZone();
+
+        // [DEBUG] Identifies exactly which GameObject/collider fired, since several
+        // colliders can all resolve to the same zone (e.g. Body). Remove once the
+        // neck-race issue is confirmed fixed.
+        Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}) | t={Time.time:F2}s");
+
+        bool continuous = horseFsm.NotifyZoneEnter(zone);
 
         if (isRump)
             horseFsm.SetTouchedBehind(true, continuous);

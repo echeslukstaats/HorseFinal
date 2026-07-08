@@ -139,6 +139,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5787812062351051217}
   - component: {fileID: 2241714172524315547}
+  - component: {fileID: 5956408327183642467}
   m_Layer: 7
   m_Name: Neck1Collider
   m_TagString: Untagged
@@ -184,6 +185,21 @@ CapsuleCollider:
   m_Height: 0.63
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5956408327183642467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174198789144905937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
+  isNeck: 1
 --- !u!1 &1545471351792511769
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,6 +280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2277702896489820522}
   - component: {fileID: 4253155574350191977}
+  - component: {fileID: 5219458975143080351}
   m_Layer: 7
   m_Name: Neck2Collider
   m_TagString: Untagged
@@ -309,6 +326,21 @@ CapsuleCollider:
   m_Height: 0.47
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5219458975143080351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692124280228369303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
+  isNeck: 1
 --- !u!1 &1708047085786658147
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,10 +1680,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.37
-  m_Height: 0.97
+  m_Radius: 0.4290889
+  m_Height: 0.85817766
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0.000000015117672, y: -0.064552784, z: 0.009078772}
 --- !u!114 &4283185892891372164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1986,6 +2018,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3838085080116347927}
   - component: {fileID: 1420427158423801680}
+  - component: {fileID: 736374463900982144}
   m_Layer: 7
   m_Name: Neck3Collider
   m_TagString: Untagged
@@ -2031,6 +2064,21 @@ CapsuleCollider:
   m_Height: 0.51
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &736374463900982144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7925360724116843037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
+  isNeck: 1
 --- !u!1 &7987080183386733142
 GameObject:
   m_ObjectHideFlags: 0
@@ -2095,7 +2143,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7987080183386733142}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cd1a29a53af8f44f9ea845d6565af1b, type: 3}
   m_Name: 
