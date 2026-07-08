@@ -7,11 +7,29 @@ public class BodyZoneTrigger : MonoBehaviour
     [Tooltip("Tick this only on the rump collider.")]
     public bool isRump = false;
 
+    [Tooltip("Tick this only on the nape/neck collider (upper neck, just behind the head). Drives EmotionalState Happy gating.")]
+    public bool isNeck = false;
+
+    private HorseFsm.BodyZone ResolveZone()
+    {
+        if (isRump) return HorseFsm.BodyZone.Rump;
+        if (isNeck) return HorseFsm.BodyZone.Neck;
+        return HorseFsm.BodyZone.Body;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("VRHand")) return;
 
-        bool continuous = horseFsm.NotifyZoneEnter(isRump ? HorseFsm.BodyZone.Rump : HorseFsm.BodyZone.Body);
+        var zone = ResolveZone();
+
+        // [DEBUG] Identifies exactly which GameObject/collider fired, since several
+        // colliders can all resolve to the same zone (e.g. Body). Remove once the
+        // neck-race issue is confirmed fixed.
+        if (Debug.isDebugBuild)
+            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}) | t={Time.time:F2}s");
+
+        bool continuous = horseFsm.NotifyZoneEnter(zone);
 
         if (isRump)
             horseFsm.SetTouchedBehind(true, continuous);
@@ -33,6 +51,6 @@ public class BodyZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("VRHand")) return;
 
-        horseFsm.RefreshZoneTime(isRump ? HorseFsm.BodyZone.Rump : HorseFsm.BodyZone.Body);
+        horseFsm.RefreshZoneTime(ResolveZone());
     }
 }
