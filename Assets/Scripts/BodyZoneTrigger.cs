@@ -20,6 +20,18 @@ public class BodyZoneTrigger : MonoBehaviour
     private const int REAR_LEFT_LEG = 3;
     private const int REAR_RIGHT_LEG = 4;
 
+    // RearApproachLeft/Right care about where the PLAYER'S BODY is, not their
+    // hands — a player can walk behind the horse with hands lowered/crossed
+    // and still be in danger. All other zones (petting, rump touch) still key
+    // off the hand collider, since that's what's actually making contact.
+    private const string PLAYER_TAG = "VRPlayer";
+    private const string HAND_TAG = "VRHand";
+
+    private bool IsRearApproachZone => isRearApproachLeft || isRearApproachRight;
+
+    private bool IsRelevantCollider(Collider other) =>
+        IsRearApproachZone ? other.CompareTag(PLAYER_TAG) : other.CompareTag(HAND_TAG);
+
     private HorseFsm.BodyZone ResolveZone()
     {
         if (isRump) return HorseFsm.BodyZone.Rump;
@@ -31,7 +43,7 @@ public class BodyZoneTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("VRHand")) return;
+        if (!IsRelevantCollider(other)) return;
 
         var zone = ResolveZone();
 
@@ -39,7 +51,7 @@ public class BodyZoneTrigger : MonoBehaviour
         // colliders can all resolve to the same zone (e.g. Body). Remove once the
         // neck-race issue is confirmed fixed.
         if (Debug.isDebugBuild)
-            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}, isRearApproachLeft={isRearApproachLeft}, isRearApproachRight={isRearApproachRight}) | t={Time.time:F2}s");
+            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}, isRearApproachLeft={isRearApproachLeft}, isRearApproachRight={isRearApproachRight}) | collider={other.name} tag={other.tag} | t={Time.time:F2}s");
 
         bool continuous = horseFsm.NotifyZoneEnter(zone);
 
@@ -68,7 +80,7 @@ public class BodyZoneTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("VRHand")) return;
+        if (!IsRelevantCollider(other)) return;
 
         if (isRearApproachLeft || isRearApproachRight)
         {
@@ -85,7 +97,7 @@ public class BodyZoneTrigger : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag("VRHand")) return;
+        if (!IsRelevantCollider(other)) return;
 
         horseFsm.RefreshZoneTime(ResolveZone());
     }
