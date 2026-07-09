@@ -12,6 +12,7 @@ using UnityEngine;
 // X/Z follow the head anchor (room-scale movement). Y is locked to a fixed
 // body height above the floor reference, so crouching or looking down/up
 // doesn't make the collider bob in and out of a trigger zone.
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerBodyTracker : MonoBehaviour
 {
     [Tooltip("Usually the OVRCameraRig's CenterEyeAnchor. Only its X/Z position is used — Y is locked below via fixedBodyHeight.")]
