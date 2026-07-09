@@ -26,12 +26,21 @@ public class PlayerBodyTracker : MonoBehaviour
 
     private Rigidbody rb;
 
-    void Awake()
+private void Awake()
+{
+    rb = GetComponent<Rigidbody>();
+    if (rb == null)
     {
-        rb = GetComponent<Rigidbody>();
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        Debug.LogError($"{nameof(PlayerBodyTracker)} requires a Rigidbody.", this);
+        enabled = false;
+        return;
     }
+
+    rb.isKinematic = true;
+    rb.useGravity = false;
+    rb.interpolation = RigidbodyInterpolation.Interpolate;
+    rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+}
 
     void FixedUpdate()
     {
