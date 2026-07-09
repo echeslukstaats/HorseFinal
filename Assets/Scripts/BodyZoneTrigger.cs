@@ -10,14 +10,22 @@ public class BodyZoneTrigger : MonoBehaviour
     [Tooltip("Tick this only on the nape/neck collider (upper neck, just behind the head). Drives EmotionalState Happy gating.")]
     public bool isNeck = false;
 
-    [Tooltip("Tick this only on the rear-approach collider (wide capture zone behind the rump, parented under Pelvis). Fires an immediate, unconditional kick on entry — bypasses hasGreeted/RumpTouchIsTrusted/TouchIsSafe entirely, gated only by the existing kick cooldown. Do not also tick isRump or isNeck.")]
-    public bool isRearApproach = false;
+    [Tooltip("Tick this only on the rear-approach LEFT collider (wide capture zone behind the rump, left side, parented under Pelvis). Fires an immediate, unconditional kick with the LEFT rear leg (BL) on entry — bypasses hasGreeted/RumpTouchIsTrusted/TouchIsSafe entirely, gated only by the existing kick cooldown. Do not also tick isRump, isNeck or isRearApproachRight.")]
+    public bool isRearApproachLeft = false;
+
+    [Tooltip("Tick this only on the rear-approach RIGHT collider (wide capture zone behind the rump, right side, parented under Pelvis). Fires an immediate, unconditional kick with the RIGHT rear leg (BR) on entry — bypasses hasGreeted/RumpTouchIsTrusted/TouchIsSafe entirely, gated only by the existing kick cooldown. Do not also tick isRump, isNeck or isRearApproachLeft.")]
+    public bool isRearApproachRight = false;
+
+    // Leg indices matching HorseFsm.FireKickTrigger: 1=FL, 2=FR, 3=BL, 4=BR.
+    private const int REAR_LEFT_LEG = 3;
+    private const int REAR_RIGHT_LEG = 4;
 
     private HorseFsm.BodyZone ResolveZone()
     {
         if (isRump) return HorseFsm.BodyZone.Rump;
         if (isNeck) return HorseFsm.BodyZone.Neck;
-        if (isRearApproach) return HorseFsm.BodyZone.RearApproach;
+        if (isRearApproachLeft) return HorseFsm.BodyZone.RearApproachLeft;
+        if (isRearApproachRight) return HorseFsm.BodyZone.RearApproachRight;
         return HorseFsm.BodyZone.Body;
     }
 
@@ -31,16 +39,22 @@ public class BodyZoneTrigger : MonoBehaviour
         // colliders can all resolve to the same zone (e.g. Body). Remove once the
         // neck-race issue is confirmed fixed.
         if (Debug.isDebugBuild)
-            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}, isRearApproach={isRearApproach}) | t={Time.time:F2}s");
+            Debug.Log($"[COLLIDER-HIT] {gameObject.name} → zone={zone} (isRump={isRump}, isNeck={isNeck}, isRearApproachLeft={isRearApproachLeft}, isRearApproachRight={isRearApproachRight}) | t={Time.time:F2}s");
 
         bool continuous = horseFsm.NotifyZoneEnter(zone);
 
-        if (isRearApproach)
+        if (isRearApproachLeft)
         {
-            // Immediate, unconditional kick — no touchedBehind/body-touch bookkeeping,
-            // so this zone can never feed RumpTouchIsTrusted/TouchIsSafe for the
-            // existing Rump/BehindTrigger kick path.
-            horseFsm.TriggerImmediateKick();
+            // Immediate, unconditional kick with the LEFT rear leg — no
+            // touchedBehind/body-touch bookkeeping, so this zone can never feed
+            // RumpTouchIsTrusted/TouchIsSafe for the existing Rump/BehindTrigger
+            // kick path.
+            horseFsm.TriggerImmediateKick(REAR_LEFT_LEG);
+        }
+        else if (isRearApproachRight)
+        {
+            // Same as above, but forces the RIGHT rear leg.
+            horseFsm.TriggerImmediateKick(REAR_RIGHT_LEG);
         }
         else if (isRump)
         {
@@ -56,7 +70,7 @@ public class BodyZoneTrigger : MonoBehaviour
     {
         if (!other.CompareTag("VRHand")) return;
 
-        if (isRearApproach)
+        if (isRearApproachLeft || isRearApproachRight)
         {
             // The kick is a one-shot event on entry, not a maintained state —
             // nothing to do here.

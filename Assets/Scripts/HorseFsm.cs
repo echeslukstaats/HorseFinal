@@ -95,7 +95,7 @@ public class HorseFsm : MonoBehaviour
     {
         None, Head, Neck, Body, Rump,
         LegFL, HoofFL, LegFR, HoofFR, LegBL, HoofBL, LegBR, HoofBR,
-        RearApproach
+        RearApproachLeft, RearApproachRight
     }
 
     private BodyZone lastZoneTouched = BodyZone.None;
@@ -116,7 +116,8 @@ public class HorseFsm : MonoBehaviour
         { BodyZone.HoofBL, new[] { BodyZone.LegBL } },
         { BodyZone.LegBR,  new[] { BodyZone.Rump, BodyZone.Body, BodyZone.HoofBR } },
         { BodyZone.HoofBR, new[] { BodyZone.LegBR } },
-        { BodyZone.RearApproach, new[] { BodyZone.Rump, BodyZone.Body } },
+        { BodyZone.RearApproachLeft,  new[] { BodyZone.Rump, BodyZone.Body } },
+        { BodyZone.RearApproachRight, new[] { BodyZone.Rump, BodyZone.Body } },
     };
 
     public enum EmotionalState { Neutral, Happy, Anxious }
@@ -172,28 +173,29 @@ public class HorseFsm : MonoBehaviour
         return continuous;
     }
 
-private void UpdateEmotionalState(BodyZone zone, bool continuous)
-{
-    if (continuous)
-        return;
-
-    bool isFirstTouch = lastZoneTouched == BodyZone.None;
-
-    if (isFirstTouch)
+    private void UpdateEmotionalState(BodyZone zone, bool continuous)
     {
-        firstTouchZone = zone.ToString();
-        emotionalState = (zone == BodyZone.Neck) ? EmotionalState.Happy : EmotionalState.Anxious;
-        Debug.Log($"[EMOTION-STATE] {emotionalState} triggered from {firstTouchZone} | t={Time.time:F2}s | first touch");
-    }
-    else
-    {
-        // Continuity chain broken: always anxious per gating rules.
-        emotionalState = EmotionalState.Anxious;
-        Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
-    }
+        if (continuous)
+            return;
 
-    if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
-    else TriggerEarsAnxious();
+        bool isFirstTouch = lastZoneTouched == BodyZone.None;
+
+        if (isFirstTouch)
+        {
+            firstTouchZone = zone.ToString();
+            emotionalState = (zone == BodyZone.Neck) ? EmotionalState.Happy : EmotionalState.Anxious;
+            Debug.Log($"[EMOTION-STATE] {emotionalState} triggered from {firstTouchZone} | t={Time.time:F2}s | first touch");
+        }
+        else
+        {
+            // Continuity chain broken: always anxious per gating rules.
+            emotionalState = EmotionalState.Anxious;
+            Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
+        }
+
+        if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
+        else TriggerEarsAnxious();
+
     }
 
     public void TriggerEarsHappy()
@@ -285,7 +287,7 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
             && Time.time - lastZoneTouchTime > ZONE_CONTINUITY_WINDOW)
         {
             ResetEmotionalStateToNeutral();
-            lastZoneTouched = BodyZone.None; 
+            lastZoneTouched = BodyZone.None;
         }
 
         switch (currState)
@@ -384,6 +386,23 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
 
                 startAnxiousTimer += Time.deltaTime;
 
+                // ── Kick finish/reset — runs every frame regardless of what started
+                // the kick (Rump/leg touch OR RearApproachLeft/Right), since the
+                // latter never sets touchedBehind/legTouched and must still get its
+                // layer-4 weight and leg rig weight cleaned up on completion. ──────
+                if (kickStarted)
+                {
+                    var kickInfo = animator.GetCurrentAnimatorStateInfo(4);
+                    if (kickInfo.normalizedTime >= 1f)
+                    {
+                        Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
+                        animator.SetLayerWeight(4, 0);
+                        legRigWeight.ChangeWeight(1f);
+                        kickStarted = false;
+                        lastKickedLeg = 0;
+                    }
+                }
+
                 if (touchedBehind || legTouched != 0)
                 {
                     Debug.Log($"[KICK-GATE] touchedBehind={touchedBehind} (continuous={touchedBehindWasContinuous}) | legTouched={legTouched} (continuous={legTouchWasContinuous}) | RumpTouchIsTrusted={RumpTouchIsTrusted} | TouchIsSafe={TouchIsSafe}");
@@ -405,28 +424,6 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
                             hasKicked = true;
                             Debug.Log($"[KICK] Layer 4 weight set to 1. Current state on layer 4: {animator.GetCurrentAnimatorStateInfo(4).fullPathHash}");
                         }
-                        /*
-                        else if (kickStarted && animator.GetCurrentAnimatorStateInfo(4).normalizedTime >= 1f)
-                        {
-                            Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
-                            animator.SetLayerWeight(4, 0);
-                            legRigWeight.ChangeWeight(1f);
-                            kickStarted = false;
-                            lastKickedLeg = 0;
-                        }*/
-                        else if (kickStarted)
-                        {
-                            var info = animator.GetCurrentAnimatorStateInfo(4);
-
-                            if (info.normalizedTime >= 1f)
-                            {
-                                Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
-                                animator.SetLayerWeight(4, 0);
-                                legRigWeight.ChangeWeight(1f);
-                                kickStarted = false;
-                                lastKickedLeg = 0;
-                            }
-                        }
                         startAnxiousTimer = 1;
                     }
                     else
@@ -436,8 +433,14 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
                 }
                 else
                 {
-                    kickStarted = false;
-                    kickLocked = false;
+                    // Only release the cooldown once the kick has actually finished
+                    // playing (kickStarted was cleared above). Clearing kickLocked
+                    // while kickStarted is still true would let a new kick fire
+                    // mid-animation — this is exactly what was happening for
+                    // RearApproachLeft/Right, which never set touchedBehind/legTouched
+                    // and so always fell into this branch on the very next frame.
+                    if (!kickStarted)
+                        kickLocked = false;
                 }
 
                 if (startAnxiousTimer >= 40f || HorseEmotion > 0)
@@ -484,23 +487,29 @@ private void UpdateEmotionalState(BodyZone zone, bool continuous)
     }
 
     // ── Rear-approach immediate kick (no state gating) ──────────────────────
-    // Called directly by BodyZoneTrigger when a hand enters the RearApproach
+    // Called directly by BodyZoneTrigger when a hand enters a RearApproach
     // zone. Deliberately bypasses hasGreeted, RumpTouchIsTrusted and
     // TouchIsSafe — the only thing that can still block this kick is the
     // existing kickStarted/kickLocked cooldown. Forcing SwitchState(Anxious)
     // means the end-of-kick reset already handled in the Anxious block of
     // Update() (normalizedTime >= 1f on layer 4) applies unchanged, so no
     // reset logic is duplicated here.
-    public void TriggerImmediateKick()
+    //
+    // forcedLeg lets the caller pin which leg kicks (3=BL, 4=BR) instead of
+    // falling back to DetermineKickLeg()/DEFAULT_KICK_LEG. This is what lets
+    // RearApproachLeft/RearApproachRight each fire the correct side even when
+    // there's no hoof/leg touch on record to infer it from. Pass 0 (default)
+    // to keep the old auto-detect behaviour.
+    public void TriggerImmediateKick(int forcedLeg = 0)
     {
-        Debug.Log($"[KICK] TriggerImmediateKick() called from RearApproach zone | kickLocked={kickLocked} kickStarted={kickStarted} | t={Time.time:F2}s");
+        Debug.Log($"[KICK] TriggerImmediateKick() called | forcedLeg={forcedLeg} | kickLocked={kickLocked} kickStarted={kickStarted} | t={Time.time:F2}s");
 
         if (kickStarted || kickLocked) return;
 
         legRigWeight.ChangeWeight(0f);
         SwitchState(HorseStates.Anxious);
         animator.SetInteger("BehaviourStates", (int)currState);
-        int kickLeg = DetermineKickLeg();
+        int kickLeg = forcedLeg != 0 ? forcedLeg : DetermineKickLeg();
         FireKickTrigger(kickLeg);
         lastKickedLeg = kickLeg;
         animator.SetLayerWeight(4, 1);

@@ -959,6 +959,7 @@ MonoBehaviour:
   horseFsm: {fileID: 871611675}
   isRump: 0
   isNeck: 0
+  isRearApproach: 0
 --- !u!1 &289012371
 GameObject:
   m_ObjectHideFlags: 0
@@ -1735,6 +1736,7 @@ MonoBehaviour:
   horseFsm: {fileID: 871611675}
   isRump: 0
   isNeck: 0
+  isRearApproach: 0
 --- !u!1 &720218915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1892,6 +1894,7 @@ MonoBehaviour:
   horseFsm: {fileID: 871611675}
   isRump: 0
   isNeck: 0
+  isRearApproach: 0
 --- !u!1 &819719595
 GameObject:
   m_ObjectHideFlags: 0
