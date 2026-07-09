@@ -200,6 +200,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 1
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &1545471351792511769
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +343,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 1
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &1708047085786658147
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,6 +603,77 @@ MonoBehaviour:
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
+--- !u!1 &2389461107856583002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8269061051091475208}
+  - component: {fileID: 2494566037024467457}
+  - component: {fileID: 2015268402724986990}
+  m_Layer: 0
+  m_Name: RearApproachTrigger_Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8269061051091475208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2389461107856583002}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.929, z: -0.617}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4851027639108425161}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2494566037024467457
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2389461107856583002}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.34045023, y: 2.2532632, z: 0.8000033}
+  m_Center: {x: -0.15268642, y: 0.6266336, z: -0.099998444}
+--- !u!114 &2015268402724986990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2389461107856583002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
+  isNeck: 0
+  isRearApproachLeft: 1
+  isRearApproachRight: 0
 --- !u!1 &2581086993897537562
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,6 +1126,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 1
   isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &4156897757152459882
 GameObject:
   m_ObjectHideFlags: 0
@@ -1207,6 +1284,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 1
   isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &5196537551731991058
 GameObject:
   m_ObjectHideFlags: 0
@@ -1699,6 +1778,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &6406970755872144151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,6 +1916,79 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
+--- !u!1 &7405932148123285879
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3378396928319525300}
+  - component: {fileID: 691676549282793325}
+  - component: {fileID: 1618923924201008624}
+  m_Layer: 0
+  m_Name: RearApproachTrigger_Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3378396928319525300
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7405932148123285879}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.929, z: -0.617}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4851027639108425161}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &691676549282793325
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7405932148123285879}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2964383, y: 2.2532632, z: 0.80000335}
+  m_Center: {x: 0.1673388, y: 0.6266335, z: -0.09999835}
+--- !u!114 &1618923924201008624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7405932148123285879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab242a998fbcf44a9d866949bfdecef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BodyZoneTrigger
+  horseFsm: {fileID: 5966868726367260697}
+  isRump: 0
+  isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 1
 --- !u!1 &7559383240251854764
 GameObject:
   m_ObjectHideFlags: 0
@@ -2079,6 +2233,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 1
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &7987080183386733142
 GameObject:
   m_ObjectHideFlags: 0
@@ -2165,6 +2321,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 0
   isNeck: 1
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &8041758293179160618
 GameObject:
   m_ObjectHideFlags: 0
@@ -2322,6 +2480,8 @@ MonoBehaviour:
   horseFsm: {fileID: 5966868726367260697}
   isRump: 1
   isNeck: 0
+  isRearApproachLeft: 0
+  isRearApproachRight: 0
 --- !u!1 &8558037365423164241
 GameObject:
   m_ObjectHideFlags: 0
@@ -2859,6 +3019,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2678542886929925119, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3614926231665828644}
+    - targetCorrespondingSourceObject: {fileID: -2678542886929925119, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8269061051091475208}
+    - targetCorrespondingSourceObject: {fileID: -2678542886929925119, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3378396928319525300}
     - targetCorrespondingSourceObject: {fileID: -2390698817610780474, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7399505199819573639}
