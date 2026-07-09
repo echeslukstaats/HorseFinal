@@ -487,9 +487,8 @@ public class HorseFsm : MonoBehaviour
     }
 
     // ── Rear-approach immediate kick (no state gating) ──────────────────────
-    // Called directly by BodyZoneTrigger when a hand enters a RearApproach
-    // zone. Deliberately bypasses hasGreeted, RumpTouchIsTrusted and
-    // TouchIsSafe — the only thing that can still block this kick is the
+    // Called directly by BodyZoneTrigger when the player body proxy collider
+    // enters a RearApproach zone.
     // existing kickStarted/kickLocked cooldown. Forcing SwitchState(Anxious)
     // means the end-of-kick reset already handled in the Anxious block of
     // Update() (normalizedTime >= 1f on layer 4) applies unchanged, so no
