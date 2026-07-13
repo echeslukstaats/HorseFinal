@@ -1,0 +1,82 @@
+using UnityEngine;
+using System;
+using System.IO;
+using System.Text;
+
+public class PlayerPositionLogger : MonoBehaviour
+{
+    [Header("References")]
+    [Tooltip("The player's head (CenterEyeAnchor).")]
+    public Transform playerHead;
+
+    [Tooltip("The HorseFsm whose centerOfGravity is read.")]
+    public HorseFsm horseFsm;
+
+    [Header("Config")]
+    [Tooltip("Sampling interval in seconds.")]
+    public float samplingRate = 0.5f;
+
+    private StreamWriter writer;
+    private float timer = 0f;
+    private string filePath;
+
+    void Start()
+    {
+        if (!Validate()) { enabled = false; return; }
+
+        string fileName = $"player_position_log_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+        filePath = Path.Combine(Application.persistentDataPath, fileName);
+
+        writer = new StreamWriter(filePath, append: false, Encoding.UTF8);
+        writer.WriteLine("timestamp,player_x,player_y,player_z");
+        writer.Flush();
+
+        Debug.Log($"[PosLogger] Recording started → {filePath}");
+    }
+
+    void Update()
+    {
+        if (writer == null) return;
+
+        timer += Time.deltaTime;
+        if (timer < samplingRate) return;
+        timer = 0f;
+
+        Vector3 relativePos = horseFsm.centerOfGravity.InverseTransformPoint(playerHead.position);
+        string line = $"{DateTime.UtcNow:o},{relativePos.x:F4},{relativePos.y:F4},{relativePos.z:F4}";
+
+        writer.WriteLine(line);
+        writer.Flush(); // regular flush to avoid losing data if the app crashes
+    }
+
+    void OnApplicationQuit()
+    {
+        StopRecording();
+    }
+
+    void OnApplicationPause(bool paused)
+    {
+        // On Quest, a pause can precede the actual application quit.
+        if (paused) StopRecording();
+    }
+
+    private void StopRecording()
+    {
+        if (writer == null) return;
+        writer.Flush();
+        writer.Close();
+        writer = null;
+        Debug.Log($"[PosLogger] Recording stopped. File saved at {filePath}");
+    }
+
+    private bool Validate()
+    {
+        if (playerHead == null) { Debug.LogWarning("[PosLogger] playerHead not assigned."); return false; }
+        if (horseFsm == null || horseFsm.centerOfGravity == null)
+        {
+            Debug.LogWarning("[PosLogger] horseFsm.centerOfGravity not assigned.");
+            return false;
+        }
+        return true;
+    }
+}
