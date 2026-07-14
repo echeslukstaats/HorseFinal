@@ -43,7 +43,7 @@ public class PlayerPositionLogger : MonoBehaviour
         timer = 0f;
 
         Vector3 relativePos = horseFsm.centerOfGravity.InverseTransformPoint(playerHead.position);
-        string line = $"{DateTime.UtcNow:o},{relativePos.x:F4},{relativePos.y:F4},{relativePos.z:F4}";
+string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:o},{1:F4},{2:F4},{3:F4}", DateTime.UtcNow, relativePos.x, relativePos.y, relativePos.z);
 
         writer.WriteLine(line);
         writer.Flush(); // regular flush to avoid losing data if the app crashes
