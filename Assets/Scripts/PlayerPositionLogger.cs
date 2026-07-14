@@ -69,14 +69,14 @@ string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "
         Debug.Log($"[PosLogger] Recording stopped. File saved at {filePath}");
     }
 
-    private bool Validate()
+private bool Validate()
+{
+    if (playerHead == null) { Debug.LogWarning("[PosLogger] playerHead not assigned."); return false; }
+    if (horseFsm == null || horseFsm.centerOfGravity == null)
     {
-        if (playerHead == null) { Debug.LogWarning("[PosLogger] playerHead not assigned."); return false; }
-        if (horseFsm == null || horseFsm.centerOfGravity == null)
-        {
-            Debug.LogWarning("[PosLogger] horseFsm.centerOfGravity not assigned.");
-            return false;
-        }
-        return true;
+        Debug.LogWarning("[PosLogger] horseFsm.centerOfGravity not assigned.");
+        return false;
     }
+    if (samplingRate <= 0f) { Debug.LogWarning("[PosLogger] samplingRate must be > 0 seconds."); return false; }
+    return true;
 }
