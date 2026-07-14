@@ -125,6 +125,10 @@ public class HorseFsm : MonoBehaviour
     private string firstTouchZone = null;
     private const int EARS_LAYER = 7;
 
+    // ── Track player ─────────────────────────────────────────
+    [Header("Player Tracking")]
+    [Tooltip("Transform representing the horse's center of gravity (e.g., the Hips bone, or an empty point placed at the center of the body).")]
+    public Transform centerOfGravity;
 
     public void RefreshZoneTime(BodyZone zone)
     {
