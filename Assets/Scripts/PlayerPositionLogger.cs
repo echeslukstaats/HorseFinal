@@ -54,12 +54,6 @@ string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "
         StopRecording();
     }
 
-    void OnApplicationPause(bool paused)
-    {
-        // On Quest, a pause can precede the actual application quit.
-        if (paused) StopRecording();
-    }
-
     private void StopRecording()
     {
         if (writer == null) return;
