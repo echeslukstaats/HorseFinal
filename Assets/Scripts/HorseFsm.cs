@@ -197,25 +197,27 @@ public class HorseFsm : MonoBehaviour
             Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
         }
 
-        if (emotionalState == EmotionalState.Happy) TriggerEarsHappy();
-        else TriggerEarsAnxious();
+        if (emotionalState == EmotionalState.Anxious) TriggerEarsAnxious();
+        else TriggerEarsNeutral();
 
     }
 
-    public void TriggerEarsHappy()
+    // HappyEars was removed from the emotional state logic: it never matched
+    // actual game behavior (ears stayed neutral instead of transitioning to
+    // happy). Only AnxiousEars remains; the Happy emotional state now simply
+    // leaves the ears in their neutral state.
+    public void TriggerEarsNeutral()
     {
-        animator.SetBool("isHappy", true);
         animator.SetBool("isAnxious", false);
-        animator.SetLayerWeight(EARS_LAYER, 1f);
-        Debug.Log($"[EMOTION-STATE] TriggerEarsHappy() — isHappy=true isAnxious=false layer{EARS_LAYER}.weight=1 | t={Time.time:F2}s");
+        animator.SetLayerWeight(EARS_LAYER, 0f);
+        Debug.Log($"[EMOTION-STATE] TriggerEarsNeutral() — isAnxious=false layer{EARS_LAYER}.weight=0 | t={Time.time:F2}s");
     }
 
     public void TriggerEarsAnxious()
     {
         animator.SetBool("isAnxious", true);
-        animator.SetBool("isHappy", false);
         animator.SetLayerWeight(EARS_LAYER, 1f);
-        Debug.Log($"[EMOTION-STATE] TriggerEarsAnxious() — isAnxious=true isHappy=false layer{EARS_LAYER}.weight=1 | t={Time.time:F2}s");
+        Debug.Log($"[EMOTION-STATE] TriggerEarsAnxious() — isAnxious=true layer{EARS_LAYER}.weight=1 | t={Time.time:F2}s");
     }
 
     private void ResetEmotionalStateToNeutral()
@@ -224,7 +226,6 @@ public class HorseFsm : MonoBehaviour
 
         emotionalState = EmotionalState.Neutral;
         firstTouchZone = null;
-        animator.SetBool("isHappy", false);
         animator.SetBool("isAnxious", false);
         animator.SetLayerWeight(EARS_LAYER, 0f);
         Debug.Log($"[EMOTION-STATE] Neutral (idle, no active contact) | t={Time.time:F2}s");
@@ -298,9 +299,11 @@ public class HorseFsm : MonoBehaviour
         {
             case HorseStates.None:
 
-                // Ne pilote les oreilles par physique que si aucune couche emotionnelle
-                // n'est active, pour eviter un conflit avec le layer 7 (Ears Animator).
-                if (emotionalState == EmotionalState.Neutral)
+                // Ne pilote les oreilles par physique que si la couche Ears Animator
+                // (layer 7) n'est pas active (isAnxious=false), pour eviter un conflit.
+                // Happy est traite comme Neutral pour les oreilles: HappyEars a ete
+                // retire, donc l'etat Happy laisse les oreilles en position neutre.
+                if (emotionalState == EmotionalState.Neutral || emotionalState == EmotionalState.Happy)
                     ChangeEarRotation(Quaternion.identity, Quaternion.identity);
 
                 if (handNearMouth)
@@ -369,7 +372,7 @@ public class HorseFsm : MonoBehaviour
 
             case HorseStates.Anxious:
 
-                if (emotionalState == EmotionalState.Neutral)
+                if (emotionalState == EmotionalState.Neutral || emotionalState == EmotionalState.Happy)
                     ChangeEarRotation(Quaternion.Euler(rEarRotation), Quaternion.Euler(lEarRotation));
 
                 AnimatorStateInfo animatorInfo = animator.GetCurrentAnimatorStateInfo(0);
@@ -618,7 +621,6 @@ public class HorseFsm : MonoBehaviour
         // horse emotion reset
         emotionalState = EmotionalState.Neutral;
         firstTouchZone = null;
-        animator.SetBool("isHappy", false);
         animator.SetBool("isAnxious", false);
         animator.SetLayerWeight(EARS_LAYER, 0f);
     }

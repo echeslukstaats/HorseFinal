@@ -43,7 +43,7 @@ public class PlayerPositionLogger : MonoBehaviour
         timer = 0f;
 
         Vector3 relativePos = horseFsm.centerOfGravity.InverseTransformPoint(playerHead.position);
-string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:o},{1:F4},{2:F4},{3:F4}", DateTime.UtcNow, relativePos.x, relativePos.y, relativePos.z);
+        string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:o},{1:F4},{2:F4},{3:F4}", DateTime.UtcNow, relativePos.x, relativePos.y, relativePos.z);
 
         writer.WriteLine(line);
         writer.Flush(); // regular flush to avoid losing data if the app crashes
@@ -63,14 +63,15 @@ string line = string.Format(System.Globalization.CultureInfo.InvariantCulture, "
         Debug.Log($"[PosLogger] Recording stopped. File saved at {filePath}");
     }
 
-private bool Validate()
-{
-    if (playerHead == null) { Debug.LogWarning("[PosLogger] playerHead not assigned."); return false; }
-    if (horseFsm == null || horseFsm.centerOfGravity == null)
+    private bool Validate()
     {
-        Debug.LogWarning("[PosLogger] horseFsm.centerOfGravity not assigned.");
-        return false;
+        if (playerHead == null) { Debug.LogWarning("[PosLogger] playerHead not assigned."); return false; }
+        if (horseFsm == null || horseFsm.centerOfGravity == null)
+        {
+            Debug.LogWarning("[PosLogger] horseFsm.centerOfGravity not assigned.");
+            return false;
+        }
+        if (samplingRate <= 0f) { Debug.LogWarning("[PosLogger] samplingRate must be > 0 seconds."); return false; }
+        return true;
     }
-    if (samplingRate <= 0f) { Debug.LogWarning("[PosLogger] samplingRate must be > 0 seconds."); return false; }
-    return true;
 }
