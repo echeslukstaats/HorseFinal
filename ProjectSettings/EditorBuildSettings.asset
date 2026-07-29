@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FlinchTestScene.unity
     guid: 1b1d907af9d40bf47898b52726bc8071
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ExperimentScene.unity
     guid: a4d92d52d6e60714799f63e1a2d9f1fe
+  - enabled: 1
+    path: Assets/Scenes/FixDarkStainScene.unity
+    guid: a0aba43ed665604498b1dad26eb896a7
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7607bd17222b8724f82623745b615396, type: 2}
