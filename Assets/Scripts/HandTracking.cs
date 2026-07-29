@@ -14,6 +14,11 @@ public class HandTracking : MonoBehaviour
     private Vector3 previousPosition;
     private bool hasPreviousPosition = false;
 
+    [Header("Debug")]
+    [Tooltip("Logs trackedHand source position vs. applied collider position every N FixedUpdate calls. Set to 0 to disable.")]
+    public int debugLogEveryNFrames = 30;
+    private int debugFrameCounter = 0;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -21,10 +26,18 @@ public class HandTracking : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
         sphereCollider = GetComponent<SphereCollider>();
+
+        if (trackedHand == null)
+            Debug.LogError($"[HandTracking] {gameObject.name}: trackedHand is NOT assigned in the inspector.");
+
+        if (sphereCollider == null)
+            Debug.LogError($"[HandTracking] {gameObject.name}: no SphereCollider found on this GameObject — SweepCheck will throw.");
     }
 
     void FixedUpdate()
     {
+        if (trackedHand == null) return; // avoid NRE spam if unassigned; already logged in Awake
+
         Vector3 targetPosition = trackedHand.position;
 
         if (hasPreviousPosition)
@@ -37,6 +50,17 @@ public class HandTracking : MonoBehaviour
 
         previousPosition = targetPosition;
         hasPreviousPosition = true;
+
+        if (debugLogEveryNFrames > 0)
+        {
+            debugFrameCounter++;
+            if (debugFrameCounter >= debugLogEveryNFrames)
+            {
+                debugFrameCounter = 0;
+                float drift = Vector3.Distance(rb.position, trackedHand.position);
+                Debug.Log($"[HAND-POS] {gameObject.name} | trackedHand({trackedHand.name})={trackedHand.position:F3} | rb.position={rb.position:F3} | drift={drift:F4}m | t={Time.time:F2}s");
+            }
+        }
     }
 
     private void SweepCheck(Vector3 from, Vector3 to)
