@@ -655,8 +655,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.34045023, y: 2.2532632, z: 0.8000033}
-  m_Center: {x: -0.15268642, y: 0.6266336, z: -0.099998444}
+  m_Size: {x: 0.34045023, y: 2.06, z: 0.38}
+  m_Center: {x: -0.15268642, y: 0.6266336, z: 0.17}
 --- !u!114 &2015268402724986990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1970,8 +1970,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2964383, y: 2.2532632, z: 0.80000335}
-  m_Center: {x: 0.1673388, y: 0.6266335, z: -0.09999835}
+  m_Size: {x: 0.29643828, y: 2.06, z: 0.4}
+  m_Center: {x: 0.16733882, y: 0.6266335, z: 0.17}
 --- !u!114 &1618923924201008624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3291,10 +3291,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.22777465
+  m_Radius: 0.24326521
   m_Height: 0.61570513
   m_Direction: 1
-  m_Center: {x: -0.03898466, y: 0.0708591, z: 0.05636761}
+  m_Center: {x: -0.054475255, y: 0.0708591, z: 0.056367625}
 --- !u!114 &6463659719175362233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3400,6 +3400,7 @@ MonoBehaviour:
   legRigWeight: {fileID: 4730503773745391652}
   hasGreeted: 0
   lastBodyTouchTime: -999
+  centerOfGravity: {fileID: 0}
 --- !u!114 &2349232769212384044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4258,10 +4259,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.25519052
+  m_Radius: 0.24461795
   m_Height: 0.70251733
   m_Direction: 1
-  m_Center: {x: 0.03410134, y: 0.07046496, z: 0.06928136}
+  m_Center: {x: -0.037991233, y: 0.070464954, z: 0.0479971}
 --- !u!114 &226529565661041078
 MonoBehaviour:
   m_ObjectHideFlags: 0
