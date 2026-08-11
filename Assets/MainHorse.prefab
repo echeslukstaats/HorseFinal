@@ -69,6 +69,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8793d780cef63f74cb742a87ef39be7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LegMover
+  horseFsm: {fileID: 5966868726367260697}
+  legIndex: 4
   ikRoot: {fileID: 3592808577962188834}
   ikTarget: {fileID: 2849475466171771419}
   hoofRotator: {fileID: 5235208284350037390}
@@ -743,6 +745,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8793d780cef63f74cb742a87ef39be7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LegMover
+  horseFsm: {fileID: 5966868726367260697}
+  legIndex: 2
   ikRoot: {fileID: 5403576772279735312}
   ikTarget: {fileID: 4821317953345968955}
   hoofRotator: {fileID: 2303209549404428850}
@@ -1480,6 +1484,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8793d780cef63f74cb742a87ef39be7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LegMover
+  horseFsm: {fileID: 5966868726367260697}
+  legIndex: 1
   ikRoot: {fileID: 6318975371925414823}
   ikTarget: {fileID: 6835218386917005414}
   hoofRotator: {fileID: 2561918860190999358}
@@ -2693,6 +2699,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8793d780cef63f74cb742a87ef39be7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LegMover
+  horseFsm: {fileID: 5966868726367260697}
+  legIndex: 3
   ikRoot: {fileID: 8286822080700483302}
   ikTarget: {fileID: 6678139988837999961}
   hoofRotator: {fileID: 2290044691302620421}
@@ -3400,6 +3408,7 @@ MonoBehaviour:
   legRigWeight: {fileID: 4730503773745391652}
   hasGreeted: 0
   lastBodyTouchTime: -999
+  interactionMode: 0
   centerOfGravity: {fileID: 0}
 --- !u!114 &2349232769212384044
 MonoBehaviour:

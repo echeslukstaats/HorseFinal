@@ -2987,6 +2987,10 @@ PrefabInstance:
       propertyPath: centerOfGravity
       value: 
       objectReference: {fileID: 829991444}
+    - target: {fileID: 5966868726367260697, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
+      propertyPath: interactionMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6063220993228487260, guid: 9bc2389dac4933744b26c98fab223ad9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.21902761
