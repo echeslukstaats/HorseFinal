@@ -122,6 +122,55 @@ public class HorseFsm : MonoBehaviour
 
     public enum EmotionalState { Neutral, Happy, Anxious }
     public EmotionalState emotionalState { get; private set; } = EmotionalState.Neutral;
+
+    public enum InteractionMode { Static, Dynamic }
+
+    [Header("Interaction Mode")]
+    public InteractionMode interactionMode = InteractionMode.Static;
+
+    public void SetInteractionMode(InteractionMode newMode)
+    {
+        if (newMode == interactionMode) return;
+
+        Debug.Log($"[LEG-LIFT] Interaction mode changed {interactionMode} → {newMode}, resetting leg-lift petting gate.");
+        interactionMode = newMode;
+        ResetLegLiftGate();
+    }
+
+    // ── Leg-lift petting gate (Dynamic mode only) ──────────────────────────
+    // Index 1=FL, 2=FR, 3=BL, 4=BR (index 0 unused, kept for parity with legIndex convention).
+    private bool[] legLiftGate = new bool[5];
+
+    public bool CanLiftLeg(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return false;
+
+        // Static mode: always allowed, no petting prerequisite.
+        if (interactionMode == InteractionMode.Static) return true;
+
+        // Dynamic mode: only allowed once this specific leg's gate was unlocked.
+        return legLiftGate[legIndex];
+    }
+
+    // Called by a leg-specific petting zone once HorsePettingScript confirms
+    // continuous gentle petting near that leg.
+    public void ConfirmLegPetting(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return;
+        if (emotionalState == EmotionalState.Anxious) return; // don't unlock while spooked
+        if (legLiftGate[legIndex]) return; // already unlocked, avoid log spam
+
+        legLiftGate[legIndex] = true;
+        Debug.Log($"[LEG-LIFT] Continuous petting confirmed for leg {legIndex} — leg-lift gate unlocked.");
+    }
+
+    public void ResetLegLiftGate()
+    {
+        Debug.Log("[LEG-LIFT] Petting gate reset for all legs.");
+        for (int i = 0; i < legLiftGate.Length; i++)
+            legLiftGate[i] = false;
+    }
+
     private string firstTouchZone = null;
     private const int EARS_LAYER = 7;
 
@@ -183,6 +232,7 @@ public class HorseFsm : MonoBehaviour
             return;
 
         bool isFirstTouch = lastZoneTouched == BodyZone.None;
+        EmotionalState previousState = emotionalState;
 
         if (isFirstTouch)
         {
@@ -192,14 +242,16 @@ public class HorseFsm : MonoBehaviour
         }
         else
         {
-            // Continuity chain broken: always anxious per gating rules.
             emotionalState = EmotionalState.Anxious;
             Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
         }
 
+        // Petting gate resets whenever we newly enter Anxious from Happy/Neutral.
+        if (emotionalState == EmotionalState.Anxious && previousState != EmotionalState.Anxious)
+            ResetLegLiftGate();
+
         if (emotionalState == EmotionalState.Anxious) TriggerEarsAnxious();
         else TriggerEarsNeutral();
-
     }
 
     // HappyEars was removed from the emotional state logic: it never matched
@@ -623,6 +675,9 @@ public class HorseFsm : MonoBehaviour
         firstTouchZone = null;
         animator.SetBool("isAnxious", false);
         animator.SetLayerWeight(EARS_LAYER, 0f);
+
+        //Leg lifting reset 
+        ResetLegLiftGate();
     }
 
     // ── Setters ──────────────────────────────────────────────────────────────
