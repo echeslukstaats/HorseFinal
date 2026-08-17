@@ -81,7 +81,9 @@ public class LegMover : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag("TrackedHand")) return;
+        if (!other.CompareTag("VRHand")) return;
+
+        Debug.Log($"[LEG-LIFT-DEBUG] OnTriggerStay leg={legIndex} hand={other.name} isGrabbed={isGrabbed} mode={(horseFsm != null ? horseFsm.interactionMode.ToString() : "null")}");
 
         // Petting detection always runs (even while grabbed elsewhere), so a
         // player already gripping can still be building up petting credit
@@ -91,9 +93,12 @@ public class LegMover : MonoBehaviour
         if (isGrabbed) return;
 
         bool allowed = horseFsm == null || horseFsm.CanLiftLeg(legIndex);
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} CanLiftLeg allowed={allowed}");
         if (!allowed) return; // gate closed: Dynamic mode, not yet petted (or reset by Anxious)
 
-        if (IsGripping(other.transform))
+        bool gripping = IsGripping(other.transform);
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} IsGripping={gripping} hand={other.name}");
+        if (gripping)
         {
             GrabLeg(other.transform);
         }
@@ -122,7 +127,7 @@ public class LegMover : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("TrackedHand")) return;
+        if (!other.CompareTag("VRHand")) return;
 
         pettingHistory.Remove(other.transform);
         pettingTimes.Remove(other.transform);
@@ -136,6 +141,8 @@ public class LegMover : MonoBehaviour
     private void GrabLeg(Transform vrHand)
     {
         if (isGrabbed) return;
+
+        Debug.Log($"[LEG-LIFT-DEBUG] GrabLeg() STARTED leg={legIndex} by {vrHand.name}");
 
         leadHand = vrHand;
         isGrabbed = true;
@@ -206,8 +213,8 @@ public class LegMover : MonoBehaviour
 
             handOffset = ClampEulerAngles(
                 handOffset,
-                new Vector3(-60f, -30f, -40f),
-                new Vector3(60f, 30f, 40f)
+                new Vector3(-60f, -10f, -40f),
+                new Vector3(60f, 10f, 40f)
             );
 
             finalRotation = liftQuat * handOffset;
