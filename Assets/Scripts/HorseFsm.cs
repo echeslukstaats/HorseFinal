@@ -34,8 +34,20 @@ public class HorseFsm : MonoBehaviour
     private float exitFeedingTimer = 0;
     private float startAnxiousTimer = 0;
 
-    public ChangeLegRigWeight legRigWeight;
+    public ChangeLegRigWeight[] legRigWeights = new ChangeLegRigWeight[4];
+    private ChangeLegRigWeight GetLegRig(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return null;
+        return legRigWeights[legIndex - 1];
+    }
 
+    private void SetAllLegRigWeights(float value)
+    {
+        foreach (var rig in legRigWeights)
+        {
+            if (rig != null) rig.ChangeWeight(value);
+        }
+    }
     private float twitchAmount = 120f;
     private float twitchSpeed = 1f;
 
@@ -379,7 +391,8 @@ public class HorseFsm : MonoBehaviour
                 if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe)
                 {
                     HorseEmotion = -3f;
-                    legRigWeight.ChangeWeight(0f);
+                    int kickLeg = DetermineKickLeg();
+                    GetLegRig(kickLeg)?.ChangeWeight(0f); 
                     SwitchState(HorseStates.Anxious);
                     animator.SetInteger("BehaviourStates", (int)currState);
 
@@ -456,7 +469,7 @@ public class HorseFsm : MonoBehaviour
                     {
                         Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
                         animator.SetLayerWeight(4, 0);
-                        legRigWeight.ChangeWeight(1f);
+                        GetLegRig(lastKickedLeg)?.ChangeWeight(1f); 
                         kickStarted = false;
                         lastKickedLeg = 0;
                     }
@@ -465,16 +478,14 @@ public class HorseFsm : MonoBehaviour
                 if (touchedBehind || legTouched != 0)
                 {
                     Debug.Log($"[KICK-GATE] touchedBehind={touchedBehind} (continuous={touchedBehindWasContinuous}) | legTouched={legTouched} (continuous={legTouchWasContinuous}) | RumpTouchIsTrusted={RumpTouchIsTrusted} | TouchIsSafe={TouchIsSafe}");
-                    // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
                     if (!RumpTouchIsTrusted && !TouchIsSafe)
                     {
-                        legRigWeight.ChangeWeight(0f);
-
                         if (!kickStarted && !kickLocked)
                         {
                             Debug.Log($"[KICK] Starting kick — hoofTouched={hoofTouched} legTouched={legTouched}");
                             int kickLeg = DetermineKickLeg();
                             Debug.Log($"[KICK] DetermineKickLeg() returned {kickLeg}");
+                            GetLegRig(kickLeg)?.ChangeWeight(0f);
                             FireKickTrigger(kickLeg);
                             lastKickedLeg = kickLeg;
                             animator.SetLayerWeight(4, 1);
@@ -504,7 +515,7 @@ public class HorseFsm : MonoBehaviour
 
                 if (startAnxiousTimer >= 40f || HorseEmotion > 0)
                 {
-                    legRigWeight.ChangeWeight(1f);
+                    SetAllLegRigWeights(1f);
                     animator.SetLayerWeight(4, 0);
                     kickStarted = false;
                     kickLocked = false;
@@ -564,10 +575,10 @@ public class HorseFsm : MonoBehaviour
 
         if (kickStarted || kickLocked) return;
 
-        legRigWeight.ChangeWeight(0f);
         SwitchState(HorseStates.Anxious);
         animator.SetInteger("BehaviourStates", (int)currState);
         int kickLeg = forcedLeg != 0 ? forcedLeg : DetermineKickLeg();
+        GetLegRig(kickLeg)?.ChangeWeight(0f);
         FireKickTrigger(kickLeg);
         lastKickedLeg = kickLeg;
         animator.SetLayerWeight(4, 1);
@@ -611,7 +622,7 @@ public class HorseFsm : MonoBehaviour
     {
         yield return new WaitForSeconds(length);
         animator.SetLayerWeight(layer, 0);
-        legRigWeight.ChangeWeight(1);
+        SetAllLegRigWeights(1f);
     }
 
     public IEnumerator ResetHasGreeted(float delay)
@@ -661,7 +672,7 @@ public class HorseFsm : MonoBehaviour
         animator.ResetTrigger("KickBackLeft");
         animator.ResetTrigger("KickBackRight");
 
-        legRigWeight.ChangeWeight(1f);
+        SetAllLegRigWeights(1f);
 
         SwitchState(HorseStates.None);
         animator.SetInteger("BehaviourStates", (int)HorseStates.None);

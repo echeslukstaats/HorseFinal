@@ -15,6 +15,7 @@ public class ChangeLegRigWeight : MonoBehaviour
 
     public void ChangeWeight(float newValue)
     {
+        Debug.Log($"[LEG-LIFT-DEBUG] ChangeWeight: {legRig.weight} → {newValue} | t={Time.time:F2}s");
         legRig.weight = newValue;
         rigbuilder.Build();
     }
