@@ -50,8 +50,13 @@ public class LegMover : MonoBehaviour
     private const float PETTING_GENTLE_MAX = 0.5f;
     private const float PETTING_MIN_TIME = 0.5f;
 
+    [Header("Hoof Rotation Clamp (tune per leg — front/back hoof bones may differ in orientation)")]
+    public Vector3 rotationClampMin = new Vector3(-60f, -10f, -40f);
+    public Vector3 rotationClampMax = new Vector3(60f, 10f, 40f);
+
     private void Start()
     {
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} ikRoot WORLD position={ikRoot.position} | ikTarget WORLD position (repos)={ikTarget.position}");
         initialLegPosition = ikTarget.localPosition;
         hoofRotator.localRotation = Quaternion.identity;
 
@@ -174,9 +179,12 @@ public class LegMover : MonoBehaviour
         handTargetPos += InitialReflex();
 
         Vector3 difference = handTargetPos - ikRoot.position;
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} RAW difference={difference}");
+        
         difference.y = Mathf.Clamp(difference.y, minY, maxY);
         difference.x = Mathf.Clamp(difference.x, minX, maxX);
         difference.z = Mathf.Clamp(difference.z, minZ, maxZ);
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} CLAMPED difference={difference} (minY={minY} maxY={maxY})");
 
 
         ikTarget.position = ikRoot.position + difference;
@@ -213,9 +221,10 @@ public class LegMover : MonoBehaviour
 
             handOffset = ClampEulerAngles(
                 handOffset,
-                new Vector3(-60f, -10f, -40f),
-                new Vector3(60f, 10f, 40f)
+                rotationClampMin,
+                rotationClampMax    
             );
+            Debug.Log($"[LEG-LIFT-DEBUG-TWIST] leg={legIndex} handOffset euler (avant clamp)={handOffset.eulerAngles}");
 
             finalRotation = liftQuat * handOffset;
         }

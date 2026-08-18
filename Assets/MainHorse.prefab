@@ -75,7 +75,7 @@ MonoBehaviour:
   ikTarget: {fileID: 2849475466171771419}
   hoofRotator: {fileID: 5235208284350037390}
   IKConstraint: {fileID: 8069969766301312799}
-  maxY: 0.05
+  maxY: 0.55
   minY: -0.3
   maxZ: 0.15
   minZ: -0.25
@@ -84,6 +84,8 @@ MonoBehaviour:
   isFlinching: 0
   leftOVRHand: {fileID: 0}
   rightOVRHand: {fileID: 0}
+  rotationClampMin: {x: -10, y: -10, z: -20}
+  rotationClampMax: {x: 10, y: 10, z: 20}
 --- !u!1 &886348661312350033
 GameObject:
   m_ObjectHideFlags: 0
@@ -760,6 +762,8 @@ MonoBehaviour:
   isFlinching: 0
   leftOVRHand: {fileID: 0}
   rightOVRHand: {fileID: 0}
+  rotationClampMin: {x: -60, y: -10, z: -40}
+  rotationClampMax: {x: 60, y: 10, z: 40}
 --- !u!1 &2788127808574598341
 GameObject:
   m_ObjectHideFlags: 0
@@ -1499,6 +1503,8 @@ MonoBehaviour:
   isFlinching: 0
   leftOVRHand: {fileID: 0}
   rightOVRHand: {fileID: 0}
+  rotationClampMin: {x: -60, y: -10, z: -40}
+  rotationClampMax: {x: 60, y: 10, z: 40}
 --- !u!1 &5657246318686957139
 GameObject:
   m_ObjectHideFlags: 0
@@ -2705,7 +2711,7 @@ MonoBehaviour:
   ikTarget: {fileID: 6678139988837999961}
   hoofRotator: {fileID: 2290044691302620421}
   IKConstraint: {fileID: 4198925846071077179}
-  maxY: 0.05
+  maxY: 0.55
   minY: -0.3
   maxZ: 0.15
   minZ: -0.25
@@ -2714,6 +2720,8 @@ MonoBehaviour:
   isFlinching: 0
   leftOVRHand: {fileID: 0}
   rightOVRHand: {fileID: 0}
+  rotationClampMin: {x: -10, y: -10, z: -20}
+  rotationClampMax: {x: 10, y: 10, z: 20}
 --- !u!1 &8908842749104771176
 GameObject:
   m_ObjectHideFlags: 0
