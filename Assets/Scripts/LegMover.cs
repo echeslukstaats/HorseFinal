@@ -88,8 +88,6 @@ public class LegMover : MonoBehaviour
     {
         if (!other.CompareTag("VRHand")) return;
 
-        Debug.Log($"[LEG-LIFT-DEBUG] OnTriggerStay leg={legIndex} hand={other.name} isGrabbed={isGrabbed} mode={(horseFsm != null ? horseFsm.interactionMode.ToString() : "null")}");
-
         // Petting detection always runs (even while grabbed elsewhere), so a
         // player already gripping can still be building up petting credit
         // with their other hand.
@@ -98,12 +96,9 @@ public class LegMover : MonoBehaviour
         if (isGrabbed) return;
 
         bool allowed = horseFsm == null || horseFsm.CanLiftLeg(legIndex);
-        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} CanLiftLeg allowed={allowed}");
         if (!allowed) return; // gate closed: Dynamic mode, not yet petted (or reset by Anxious)
 
-        bool gripping = IsGripping(other.transform);
-        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} IsGripping={gripping} hand={other.name}");
-        if (gripping)
+        if (IsGripping(other.transform))
         {
             GrabLeg(other.transform);
         }
