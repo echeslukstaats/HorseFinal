@@ -39,6 +39,11 @@ public class HorseModeManager : MonoBehaviour
 
     public void SetMode(HorseFsm.InteractionMode newMode) => ApplyMode(newMode, persist: true);
 
+    public void ToggleMode() =>
+        ApplyMode(CurrentMode == HorseFsm.InteractionMode.Static
+            ? HorseFsm.InteractionMode.Dynamic
+            : HorseFsm.InteractionMode.Static, persist: true);
+
     private void ApplyMode(HorseFsm.InteractionMode mode, bool persist)
     {
         if (horseFsm == null) return;
