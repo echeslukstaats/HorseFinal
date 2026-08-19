@@ -140,6 +140,11 @@ public class HorseFsm : MonoBehaviour
     [Header("Interaction Mode")]
     public InteractionMode interactionMode = InteractionMode.Static;
 
+    // Dynamic-only gate for free locomotion (walking) and the anxious-triggered
+    // sidestep recoil. Static mode keeps the horse fixed in place: petting,
+    // touch responses, and the kick/flinch safety reactions stay active in both
+    // modes, but the horse itself never leaves its spot.
+    public bool MovementAllowed => interactionMode == InteractionMode.Dynamic;
     public void SetInteractionMode(InteractionMode newMode)
     {
         if (newMode == interactionMode) return;
@@ -147,6 +152,39 @@ public class HorseFsm : MonoBehaviour
         Debug.Log($"[LEG-LIFT] Interaction mode changed {interactionMode} → {newMode}, resetting leg-lift petting gate.");
         interactionMode = newMode;
         ResetLegLiftGate();
+
+        if (interactionMode == InteractionMode.Static)
+        {
+            StopMovementImmediate();
+        }
+    }
+
+    // Forces the horse out of any in-progress locomotion (Walking state or
+    // anxious sidestep recoil) the instant we switch into Static mode, rather
+    // than waiting for the current animation to finish on its own.
+    private void StopMovementImmediate()
+    {
+        bool wasWalking = currState == HorseStates.Walking;
+        bool wasSideStepping = animator.GetLayerWeight(2) > 0f || animator.GetLayerWeight(5) > 0f;
+
+        if (!wasWalking && !wasSideStepping) return;
+
+        Debug.Log($"[MODE] Static mode engaged mid-movement (walking={wasWalking}, sideStepping={wasSideStepping}) — stopping immediately.");
+
+        startHorseWalk = false;
+        animator.SetLayerWeight(3,0);
+
+        animator.SetLayerWeight(2, 0);
+        animator.SetLayerWeight(5, 0);
+        animator.SetInteger("SideStepDone", 3);
+        SetSideStepDone(true);
+        SetSideTouched(0);
+
+        if(wasWalking)
+        {
+            SwitchState(HorseStates.None);
+            animator.SetInteger("BehaviourStates",(int)currState);
+        }
     }
 
     // ── Leg-lift petting gate (Dynamic mode only) ──────────────────────────
@@ -396,7 +434,7 @@ public class HorseFsm : MonoBehaviour
                     SwitchState(HorseStates.Anxious);
                     animator.SetInteger("BehaviourStates", (int)currState);
 
-                    if (handBehindEar && !hasGreeted)
+                    if (handBehindEar && !hasGreeted && MovementAllowed)
                     {
                         animator.SetInteger("SideStepDone", 0);
                         SetSideStepDone(false);
@@ -414,7 +452,7 @@ public class HorseFsm : MonoBehaviour
                     }
                 }
 
-                if (startHorseWalk)
+                if (startHorseWalk && MovementAllowed)
                 {
                     SwitchState(HorseStates.Walking);
                     animator.SetInteger("BehaviourStates", (int)currState);
