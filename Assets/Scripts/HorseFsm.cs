@@ -155,24 +155,26 @@ public class HorseFsm : MonoBehaviour
 
         if (interactionMode == InteractionMode.Static)
         {
-            StopMovementImmediate();
+            StopAllReactionsImmediate();
         }
     }
 
-    // Forces the horse out of any in-progress locomotion (Walking state or
-    // anxious sidestep recoil) the instant we switch into Static mode, rather
-    // than waiting for the current animation to finish on its own.
-    private void StopMovementImmediate()
+    // Forces the horse out of any in-progress reaction when Static mode starts.
+    private void StopAllReactionsImmediate()
     {
         bool wasWalking = currState == HorseStates.Walking;
+        bool wasFeeding = currState == HorseStates.Feeding;
+        bool wasAnxious = currState == HorseStates.Anxious;
         bool wasSideStepping = animator.GetLayerWeight(2) > 0f || animator.GetLayerWeight(5) > 0f;
+        bool wasKicking = animator.GetLayerWeight(4) > 0f || kickStarted;
 
-        if (!wasWalking && !wasSideStepping) return;
+        if (!wasWalking && !wasFeeding && !wasAnxious && !wasSideStepping && !wasKicking) return;
 
-        Debug.Log($"[MODE] Static mode engaged mid-movement (walking={wasWalking}, sideStepping={wasSideStepping}) — stopping immediately.");
+        Debug.Log($"[MODE] Static mode engaged mid-reaction (walking={wasWalking}, feeding={wasFeeding}, anxious={wasAnxious}, sideStepping={wasSideStepping}, kicking={wasKicking}) — stopping immediately.");
 
         startHorseWalk = false;
-        animator.SetLayerWeight(3,0);
+        animator.SetLayerWeight(3, 0);
+        animator.SetLayerWeight(1, 0);
 
         animator.SetLayerWeight(2, 0);
         animator.SetLayerWeight(5, 0);
@@ -180,10 +182,23 @@ public class HorseFsm : MonoBehaviour
         SetSideStepDone(true);
         SetSideTouched(0);
 
-        if(wasWalking)
+        animator.SetLayerWeight(4, 0);
+        SetAllLegRigWeights(1f);
+        animator.ResetTrigger("KickFrontLeft");
+        animator.ResetTrigger("KickFrontRight");
+        animator.ResetTrigger("KickBackLeft");
+        animator.ResetTrigger("KickBackRight");
+        kickStarted = false;
+        kickLocked = false;
+        lastKickedLeg = 0;
+
+        animator.SetBool("isAnxious", false);
+        animator.SetLayerWeight(EARS_LAYER, 0f);
+
+        if (wasWalking || wasFeeding || wasAnxious || wasSideStepping || wasKicking)
         {
             SwitchState(HorseStates.None);
-            animator.SetInteger("BehaviourStates",(int)currState);
+            animator.SetInteger("BehaviourStates", (int)currState);
         }
     }
 
@@ -278,6 +293,8 @@ public class HorseFsm : MonoBehaviour
 
     private void UpdateEmotionalState(BodyZone zone, bool continuous)
     {
+        if (!MovementAllowed) return;
+
         if (continuous)
             return;
 
@@ -364,7 +381,7 @@ public class HorseFsm : MonoBehaviour
 
         if (hoofIsTouchedNow && !hoofWasTouched)
         {
-            if (!hoofTouchWasContinuous && !flinchStarted)
+            if (!hoofTouchWasContinuous && !flinchStarted && MovementAllowed)
             {
                 animator.SetInteger("FlinchState", hoofTouched);
                 animator.SetLayerWeight(6, 1);
@@ -408,7 +425,7 @@ public class HorseFsm : MonoBehaviour
                 if (emotionalState == EmotionalState.Neutral || emotionalState == EmotionalState.Happy)
                     ChangeEarRotation(Quaternion.identity, Quaternion.identity);
 
-                if (handNearMouth)
+                if (handNearMouth && MovementAllowed)
                 {
                     startFeedingTimer += Time.deltaTime;
                     if (startFeedingTimer >= 1f)
@@ -426,7 +443,7 @@ public class HorseFsm : MonoBehaviour
                 }
 
                 // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
-                if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe)
+                if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe && MovementAllowed)
                 {
                     HorseEmotion = -3f;
                     int kickLeg = DetermineKickLeg();
@@ -513,7 +530,7 @@ public class HorseFsm : MonoBehaviour
                     }
                 }
 
-                if (touchedBehind || legTouched != 0)
+                if ((touchedBehind || legTouched != 0) && MovementAllowed)
                 {
                     Debug.Log($"[KICK-GATE] touchedBehind={touchedBehind} (continuous={touchedBehindWasContinuous}) | legTouched={legTouched} (continuous={legTouchWasContinuous}) | RumpTouchIsTrusted={RumpTouchIsTrusted} | TouchIsSafe={TouchIsSafe}");
                     if (!RumpTouchIsTrusted && !TouchIsSafe)
@@ -610,6 +627,8 @@ public class HorseFsm : MonoBehaviour
     public void TriggerImmediateKick(int forcedLeg = 0)
     {
         Debug.Log($"[KICK] TriggerImmediateKick() called | forcedLeg={forcedLeg} | kickLocked={kickLocked} kickStarted={kickStarted} | t={Time.time:F2}s");
+
+        if (!MovementAllowed) return;
 
         if (kickStarted || kickLocked) return;
 
