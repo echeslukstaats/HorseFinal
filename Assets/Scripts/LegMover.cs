@@ -2,9 +2,15 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Unity.VisualScripting;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LegMover : MonoBehaviour
 {
+
+    public HorseFsm horseFsm;
+    [Tooltip("1=Front Left, 2=Front Right, 3=Back Left, 4=Back Right — must match the LegTouchDetector on this same leg.")]
+    public int legIndex;
+
     public Transform ikRoot;
     public Transform ikTarget;
     public Transform hoofRotator;
@@ -35,8 +41,22 @@ public class LegMover : MonoBehaviour
     public OVRHand leftOVRHand;
     public OVRHand rightOVRHand;
 
+    // ── Leg-petting detection (gates lift in Dynamic mode) ─────────────────
+    private struct HandSample { public Vector3 pos; public float time; }
+    private Dictionary<Transform, Queue<HandSample>> pettingHistory = new Dictionary<Transform, Queue<HandSample>>();
+    private Dictionary<Transform, float> pettingTimes = new Dictionary<Transform, float>();
+    private const float PETTING_WINDOW = 0.6f;
+    private const float PETTING_GENTLE_MIN = 0.05f;
+    private const float PETTING_GENTLE_MAX = 0.5f;
+    private const float PETTING_MIN_TIME = 0.5f;
+
+    [Header("Hoof Rotation Clamp (tune per leg — front/back hoof bones may differ in orientation)")]
+    public Vector3 rotationClampMin = new Vector3(-60f, -10f, -40f);
+    public Vector3 rotationClampMax = new Vector3(60f, 10f, 40f);
+
     private void Start()
     {
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} ikRoot WORLD position={ikRoot.position} | ikTarget WORLD position (repos)={ikTarget.position}");
         initialLegPosition = ikTarget.localPosition;
         hoofRotator.localRotation = Quaternion.identity;
 
@@ -66,15 +86,24 @@ public class LegMover : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("TrackedHand") && !isGrabbed)
-        {
+        if (!other.CompareTag("VRHand")) return;
 
-            if (IsGripping(other.transform))
-            {
-                GrabLeg(other.transform);
-            }
+        // Petting detection always runs (even while grabbed elsewhere), so a
+        // player already gripping can still be building up petting credit
+        // with their other hand.
+        TrackPetting(other.transform);
+
+        if (isGrabbed) return;
+
+        bool allowed = horseFsm == null || horseFsm.CanLiftLeg(legIndex);
+        if (!allowed) return; // gate closed: Dynamic mode, not yet petted (or reset by Anxious)
+
+        if (IsGripping(other.transform))
+        {
+            GrabLeg(other.transform);
         }
     }
+
     private bool IsGripping(Transform handTransform)
     {
         bool isLeft = handTransform.name.ToLower().Contains("left");
@@ -98,16 +127,22 @@ public class LegMover : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (!other.CompareTag("VRHand")) return;
+
+        pettingHistory.Remove(other.transform);
+        pettingTimes.Remove(other.transform);
+
         if (other.transform == leadHand && isGrabbed)
         {
             ReturnLeg(other.transform);
-
         }
     }
 
     private void GrabLeg(Transform vrHand)
     {
         if (isGrabbed) return;
+
+        Debug.Log($"[LEG-LIFT-DEBUG] GrabLeg() STARTED leg={legIndex} by {vrHand.name}");
 
         leadHand = vrHand;
         isGrabbed = true;
@@ -139,9 +174,12 @@ public class LegMover : MonoBehaviour
         handTargetPos += InitialReflex();
 
         Vector3 difference = handTargetPos - ikRoot.position;
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} RAW difference={difference}");
+        
         difference.y = Mathf.Clamp(difference.y, minY, maxY);
         difference.x = Mathf.Clamp(difference.x, minX, maxX);
         difference.z = Mathf.Clamp(difference.z, minZ, maxZ);
+        Debug.Log($"[LEG-LIFT-DEBUG] leg={legIndex} CLAMPED difference={difference} (minY={minY} maxY={maxY})");
 
 
         ikTarget.position = ikRoot.position + difference;
@@ -178,9 +216,10 @@ public class LegMover : MonoBehaviour
 
             handOffset = ClampEulerAngles(
                 handOffset,
-                new Vector3(-60f, -30f, -40f),
-                new Vector3(60f, 30f, 40f)
+                rotationClampMin,
+                rotationClampMax    
             );
+            Debug.Log($"[LEG-LIFT-DEBUG-TWIST] leg={legIndex} handOffset euler (avant clamp)={handOffset.eulerAngles}");
 
             finalRotation = liftQuat * handOffset;
         }
@@ -225,5 +264,39 @@ public class LegMover : MonoBehaviour
         euler.y = Mathf.Clamp(euler.y, minAngles.y, maxAngles.y);
         euler.z = Mathf.Clamp(euler.z, minAngles.z, maxAngles.z);
         return Quaternion.Euler(euler);
+    }
+
+    private void TrackPetting(Transform hand)
+    {
+        if (!pettingHistory.ContainsKey(hand))
+        {
+            pettingHistory[hand] = new Queue<HandSample>();
+            pettingTimes[hand] = 0f;
+        }
+
+        var history = pettingHistory[hand];
+        history.Enqueue(new HandSample { pos = hand.position, time = Time.time });
+        while (history.Count > 0 && Time.time - history.Peek().time > PETTING_WINDOW)
+            history.Dequeue();
+
+        if (history.Count < 2) return;
+
+        float distance = Vector3.Distance(hand.position, history.Peek().pos);
+        float elapsed = Time.time - history.Peek().time;
+        float speed = elapsed > 0f ? distance / elapsed : 0f;
+
+        if (speed > PETTING_GENTLE_MIN && speed < PETTING_GENTLE_MAX)
+        {
+            pettingTimes[hand] += Time.deltaTime;
+            if (pettingTimes[hand] >= PETTING_MIN_TIME && horseFsm != null)
+            {
+                horseFsm.ConfirmLegPetting(legIndex);
+                pettingTimes[hand] = Mathf.Max(0f, pettingTimes[hand] - Time.deltaTime);
+            }
+        }
+        else
+        {
+            pettingTimes[hand] = Mathf.Max(0f, pettingTimes[hand] - Time.deltaTime * 0.5f);
+        }
     }
 }

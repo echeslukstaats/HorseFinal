@@ -34,8 +34,20 @@ public class HorseFsm : MonoBehaviour
     private float exitFeedingTimer = 0;
     private float startAnxiousTimer = 0;
 
-    public ChangeLegRigWeight legRigWeight;
+    public ChangeLegRigWeight[] legRigWeights = new ChangeLegRigWeight[4];
+    private ChangeLegRigWeight GetLegRig(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return null;
+        return legRigWeights[legIndex - 1];
+    }
 
+    private void SetAllLegRigWeights(float value)
+    {
+        foreach (var rig in legRigWeights)
+        {
+            if (rig != null) rig.ChangeWeight(value);
+        }
+    }
     private float twitchAmount = 120f;
     private float twitchSpeed = 1f;
 
@@ -122,6 +134,55 @@ public class HorseFsm : MonoBehaviour
 
     public enum EmotionalState { Neutral, Happy, Anxious }
     public EmotionalState emotionalState { get; private set; } = EmotionalState.Neutral;
+
+    public enum InteractionMode { Static, Dynamic }
+
+    [Header("Interaction Mode")]
+    public InteractionMode interactionMode = InteractionMode.Static;
+
+    public void SetInteractionMode(InteractionMode newMode)
+    {
+        if (newMode == interactionMode) return;
+
+        Debug.Log($"[LEG-LIFT] Interaction mode changed {interactionMode} → {newMode}, resetting leg-lift petting gate.");
+        interactionMode = newMode;
+        ResetLegLiftGate();
+    }
+
+    // ── Leg-lift petting gate (Dynamic mode only) ──────────────────────────
+    // Index 1=FL, 2=FR, 3=BL, 4=BR (index 0 unused, kept for parity with legIndex convention).
+    private bool[] legLiftGate = new bool[5];
+
+    public bool CanLiftLeg(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return false;
+
+        // Static mode: always allowed, no petting prerequisite.
+        if (interactionMode == InteractionMode.Static) return true;
+
+        // Dynamic mode: only allowed once this specific leg's gate was unlocked.
+        return legLiftGate[legIndex];
+    }
+
+    // Called by a leg-specific petting zone once HorsePettingScript confirms
+    // continuous gentle petting near that leg.
+    public void ConfirmLegPetting(int legIndex)
+    {
+        if (legIndex < 1 || legIndex > 4) return;
+        if (emotionalState == EmotionalState.Anxious) return; // don't unlock while spooked
+        if (legLiftGate[legIndex]) return; // already unlocked, avoid log spam
+
+        legLiftGate[legIndex] = true;
+        Debug.Log($"[LEG-LIFT] Continuous petting confirmed for leg {legIndex} — leg-lift gate unlocked.");
+    }
+
+    public void ResetLegLiftGate()
+    {
+        Debug.Log("[LEG-LIFT] Petting gate reset for all legs.");
+        for (int i = 0; i < legLiftGate.Length; i++)
+            legLiftGate[i] = false;
+    }
+
     private string firstTouchZone = null;
     private const int EARS_LAYER = 7;
 
@@ -183,6 +244,7 @@ public class HorseFsm : MonoBehaviour
             return;
 
         bool isFirstTouch = lastZoneTouched == BodyZone.None;
+        EmotionalState previousState = emotionalState;
 
         if (isFirstTouch)
         {
@@ -192,14 +254,16 @@ public class HorseFsm : MonoBehaviour
         }
         else
         {
-            // Continuity chain broken: always anxious per gating rules.
             emotionalState = EmotionalState.Anxious;
             Debug.Log($"[EMOTION-STATE] {emotionalState} triggered (continuity broken) | firstTouchZone={firstTouchZone} | t={Time.time:F2}s");
         }
 
+        // Petting gate resets whenever we newly enter Anxious from Happy/Neutral.
+        if (emotionalState == EmotionalState.Anxious && previousState != EmotionalState.Anxious)
+            ResetLegLiftGate();
+
         if (emotionalState == EmotionalState.Anxious) TriggerEarsAnxious();
         else TriggerEarsNeutral();
-
     }
 
     // HappyEars was removed from the emotional state logic: it never matched
@@ -327,7 +391,8 @@ public class HorseFsm : MonoBehaviour
                 if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe)
                 {
                     HorseEmotion = -3f;
-                    legRigWeight.ChangeWeight(0f);
+                    int kickLeg = DetermineKickLeg();
+                    GetLegRig(kickLeg)?.ChangeWeight(0f); 
                     SwitchState(HorseStates.Anxious);
                     animator.SetInteger("BehaviourStates", (int)currState);
 
@@ -404,7 +469,7 @@ public class HorseFsm : MonoBehaviour
                     {
                         Debug.Log("[KICK] Kick finished, resetting layer 4 weight to 0");
                         animator.SetLayerWeight(4, 0);
-                        legRigWeight.ChangeWeight(1f);
+                        GetLegRig(lastKickedLeg)?.ChangeWeight(1f); 
                         kickStarted = false;
                         lastKickedLeg = 0;
                     }
@@ -413,16 +478,14 @@ public class HorseFsm : MonoBehaviour
                 if (touchedBehind || legTouched != 0)
                 {
                     Debug.Log($"[KICK-GATE] touchedBehind={touchedBehind} (continuous={touchedBehindWasContinuous}) | legTouched={legTouched} (continuous={legTouchWasContinuous}) | RumpTouchIsTrusted={RumpTouchIsTrusted} | TouchIsSafe={TouchIsSafe}");
-                    // ── Kick guard (collègue : RumpTouchIsTrusted) ───────────
                     if (!RumpTouchIsTrusted && !TouchIsSafe)
                     {
-                        legRigWeight.ChangeWeight(0f);
-
                         if (!kickStarted && !kickLocked)
                         {
                             Debug.Log($"[KICK] Starting kick — hoofTouched={hoofTouched} legTouched={legTouched}");
                             int kickLeg = DetermineKickLeg();
                             Debug.Log($"[KICK] DetermineKickLeg() returned {kickLeg}");
+                            GetLegRig(kickLeg)?.ChangeWeight(0f);
                             FireKickTrigger(kickLeg);
                             lastKickedLeg = kickLeg;
                             animator.SetLayerWeight(4, 1);
@@ -452,7 +515,7 @@ public class HorseFsm : MonoBehaviour
 
                 if (startAnxiousTimer >= 40f || HorseEmotion > 0)
                 {
-                    legRigWeight.ChangeWeight(1f);
+                    SetAllLegRigWeights(1f);
                     animator.SetLayerWeight(4, 0);
                     kickStarted = false;
                     kickLocked = false;
@@ -512,10 +575,10 @@ public class HorseFsm : MonoBehaviour
 
         if (kickStarted || kickLocked) return;
 
-        legRigWeight.ChangeWeight(0f);
         SwitchState(HorseStates.Anxious);
         animator.SetInteger("BehaviourStates", (int)currState);
         int kickLeg = forcedLeg != 0 ? forcedLeg : DetermineKickLeg();
+        GetLegRig(kickLeg)?.ChangeWeight(0f);
         FireKickTrigger(kickLeg);
         lastKickedLeg = kickLeg;
         animator.SetLayerWeight(4, 1);
@@ -559,7 +622,7 @@ public class HorseFsm : MonoBehaviour
     {
         yield return new WaitForSeconds(length);
         animator.SetLayerWeight(layer, 0);
-        legRigWeight.ChangeWeight(1);
+        SetAllLegRigWeights(1f);
     }
 
     public IEnumerator ResetHasGreeted(float delay)
@@ -609,7 +672,7 @@ public class HorseFsm : MonoBehaviour
         animator.ResetTrigger("KickBackLeft");
         animator.ResetTrigger("KickBackRight");
 
-        legRigWeight.ChangeWeight(1f);
+        SetAllLegRigWeights(1f);
 
         SwitchState(HorseStates.None);
         animator.SetInteger("BehaviourStates", (int)HorseStates.None);
@@ -623,6 +686,9 @@ public class HorseFsm : MonoBehaviour
         firstTouchZone = null;
         animator.SetBool("isAnxious", false);
         animator.SetLayerWeight(EARS_LAYER, 0f);
+
+        //Leg lifting reset 
+        ResetLegLiftGate();
     }
 
     // ── Setters ──────────────────────────────────────────────────────────────
