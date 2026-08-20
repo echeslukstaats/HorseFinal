@@ -20,7 +20,13 @@ public class TriggerHorseWalk : MonoBehaviour
 
     private void OnWalkPressed(InputAction.CallbackContext context)
     {
-        if (horseFsm != null && !horseFsm.MovementAllowed)
+        if (horseFsm == null)
+        {
+            Debug.LogWarning("[MODE] Walk button pressed but no HorseFsm is assigned.");
+            return;
+        }
+
+        if (!horseFsm.MovementAllowed)
         {
             Debug.Log("[MODE] Walk button ignored — horse is in Static mode.");
             return;
