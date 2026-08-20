@@ -222,7 +222,7 @@ public class HorseFsm : MonoBehaviour
     public void ConfirmLegPetting(int legIndex)
     {
         if (legIndex < 1 || legIndex > 4) return;
-        if (emotionalState == EmotionalState.Anxious) return; // don't unlock while spooked
+        //if (emotionalState == EmotionalState.Anxious) return; // don't unlock while spooked
         if (legLiftGate[legIndex]) return; // already unlocked, avoid log spam
 
         legLiftGate[legIndex] = true;
