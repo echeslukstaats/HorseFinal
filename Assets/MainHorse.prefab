@@ -3598,6 +3598,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8019603822731973091}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3196279243101264919}
     - targetCorrespondingSourceObject: {fileID: 7982582028025301259, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2877737996307429296}
@@ -3984,6 +3987,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RootMotionScaler
   scale: 2
+--- !u!114 &3196279243101264919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1531436430839092377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f344c85d7e5c5b64fa839c8cb563b46c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HorseModeManager
+  horseFsm: {fileID: 5966868726367260697}
+  defaultMode: 0
 --- !u!1 &1544345827757004692 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8291348082967396772, guid: 8a8daee113c83ad4397092a3195426a3, type: 3}

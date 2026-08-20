@@ -6,8 +6,6 @@ public class TriggerHorseWalk : MonoBehaviour
     public HorseFsm horseFsm;
     public InputActionReference walkButton;
 
-    private bool isWalking = false;
-
     private void OnEnable()
     {
         walkButton.action.performed += OnWalkPressed;
@@ -22,9 +20,20 @@ public class TriggerHorseWalk : MonoBehaviour
 
     private void OnWalkPressed(InputAction.CallbackContext context)
     {
-        isWalking = !isWalking;
+        if (horseFsm == null)
+        {
+            Debug.LogWarning("[MODE] Walk button pressed but no HorseFsm is assigned.");
+            return;
+        }
 
-            horseFsm.SetStartHorseWalk(isWalking);
-
+        if (!horseFsm.MovementAllowed)
+        {
+            Debug.Log("[MODE] Walk button ignored — horse is in Static mode.");
+            return;
+        }
+        // Read the FSM's own flag instead of a locally-tracked bool, so a
+        // Static-mode force-stop (which clears startHorseWalk internally)
+        // can never desync from this button's next press.
+        horseFsm.SetStartHorseWalk(!horseFsm.startHorseWalk);
     }
 }
