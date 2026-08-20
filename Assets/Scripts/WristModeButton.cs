@@ -4,7 +4,7 @@ using UnityEngine.UI;
 // Single wrist-mounted toggle button: no label, just a colour swap between
 // Static (green) and Dynamic (orange). Parent the GameObject holding this
 // script under the hand/wrist anchor in the scene hierarchy.
-[RequireComponent(typeof(Image))]
+[RequireComponent(typeof(Image), typeof(Button))]
 public class WristModeButton : MonoBehaviour
 {
     public HorseModeManager modeManager;
