@@ -20,6 +20,22 @@ This guide explains how to set up, run, and close a testing session with the hor
 
 ---
 
+## 1.1 Important Protocol Note — Dual-Mode Testing
+
+Since the application has **two independent modes** (Static and Dynamic), each with distinct interaction logic, the experiment is conducted **twice in succession for each participant**:
+
+1. **First run:** Static mode session
+   - Complete all steps in [§2–6](#2-setting-up-the-experience) with the mode button set to **Green (Static)**
+   - Generates one player-position CSV log and one video recording
+
+2. **Second run:** Dynamic mode session
+   - Repeat all steps in [§2–6](#2-setting-up-the-experience) with the mode button set to **Orange (Dynamic)**
+   - Generates a second player-position CSV log and a second video recording
+
+Both datasets (Static and Dynamic) are collected from the same participant in a single test day. Archive both sets under a single session folder (e.g. `{participant_id}_{date}/`) containing all four files: `video_static`, `video_dynamic`, `log_static.csv`, `log_dynamic.csv`.
+
+---
+
 ## 2. Setting up the experience
 
 ### 2.1 Launching the application
@@ -27,6 +43,8 @@ The app is installed as a standalone application and appears directly in the **Q
 
 ### 2.2 Preparing internal video recording
 The project does not use a custom in-app recorder — internal capture relies on the **Quest 3's native screen recording**. Set this up before launching the app so recording can be started immediately once the session begins (see [§3](#3-starting-the-experience)).
+
+> ⚠️ **Important:** The **participant must start the internal recording themselves** (via the Quest native shortcut) right before entering the app. Internal recording stops automatically the moment the headset is removed, which is essential for data integrity. Only the wearer can reliably trigger this start action and keep the headset on throughout the session.
 
 ### 2.3 Creating and saving the play space (boundary)
 Configure the headset's boundary before starting:
