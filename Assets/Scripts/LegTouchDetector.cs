@@ -11,6 +11,10 @@ public class LegTouchDetector : MonoBehaviour
     [Header("Is this a hoof collider?")]
     public bool isHoof = false;
 
+    [Header("Leg Zone Type (only relevant if Is Hoof is false)")]
+    [Tooltip("True = upper leg/thigh: feeds the kick-escalation system. False = lower leg/shin: feeds the flinch-only signal, decoupled from kick.")]
+    public bool isKickZone = true;
+
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("VRHand")) return;
@@ -18,16 +22,18 @@ public class LegTouchDetector : MonoBehaviour
         OnTouched();
     }
 
-    public void OnTouched()
-    {
-        HorseFsm.BodyZone zone = ZoneFromLeg(legIndex, isHoof);
-        bool continuous = horseFsm.NotifyZoneEnter(zone);
+public void OnTouched()
+{
+    HorseFsm.BodyZone zone = ZoneFromLeg(legIndex, isHoof);
+    bool continuous = horseFsm.NotifyZoneEnter(zone);
 
-        if (isHoof)
-            horseFsm.SetHoofTouched(legIndex, continuous);
-        else
-            horseFsm.SetLegTouched(legIndex, continuous);
-    }
+    if (isHoof)
+        horseFsm.SetHoofTouched(legIndex, continuous);
+    else if (isKickZone)
+        horseFsm.SetLegTouched(legIndex, continuous);     // thigh → kick (inchangé)
+    else
+        horseFsm.SetShinTouched(legIndex, continuous);    // shin → flinch (nouveau)
+}
 
     private static HorseFsm.BodyZone ZoneFromLeg(int legIndex, bool isHoof)
     {
@@ -55,7 +61,9 @@ public class LegTouchDetector : MonoBehaviour
 
         if (isHoof)
             horseFsm.SetHoofTouched(0);
-        else
+        else if (isKickZone)
             horseFsm.SetLegTouched(0);
+        else
+            horseFsm.SetShinTouched(0);
     }
 }

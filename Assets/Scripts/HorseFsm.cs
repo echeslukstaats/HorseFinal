@@ -98,6 +98,13 @@ public class HorseFsm : MonoBehaviour
     private bool touchedBehindWasContinuous = false;
     private bool legTouchWasContinuous = false;
 
+    // ── Shin touched system ────────────────────────────────────────────────
+    private int shinTouched = 0;
+    private float shinTouchTimer = 0f;
+    private const float SHIN_TOUCH_TIMEOUT = 3f;
+    private bool shinTouchWasContinuous = false;
+    private bool shinWasTouched = false;
+
     private bool TouchIsSafe =>
         (touchedBehind && touchedBehindWasContinuous) ||
         (legTouched != 0 && legTouchWasContinuous);
@@ -377,20 +384,39 @@ public class HorseFsm : MonoBehaviour
             }
         }
 
+        if (shinTouched != 0)
+        {
+            shinTouchTimer += Time.deltaTime;
+            if (shinTouchTimer >= SHIN_TOUCH_TIMEOUT)
+            {
+                shinTouched = 0;
+                shinTouchTimer = 0f;
+            }
+        }           
+
         bool hoofIsTouchedNow = hoofTouched != 0;
 
         if (hoofIsTouchedNow && !hoofWasTouched)
         {
             if (!hoofTouchWasContinuous && !flinchStarted && MovementAllowed)
             {
-                animator.SetInteger("FlinchState", hoofTouched);
-                animator.SetLayerWeight(6, 1);
-                flinchStarted = true;
-                flinchPlaying = false;
+                TriggerFlinchAnimation(hoofTouched);
             }
         }
 
         hoofWasTouched = hoofIsTouchedNow;
+                
+        bool shinIsTouchedNow = shinTouched != 0;
+
+        if (shinIsTouchedNow && !shinWasTouched)
+        {
+            if (!shinTouchWasContinuous && !flinchStarted && MovementAllowed)
+            {
+                TriggerFlinchAnimation(shinTouched);
+            }
+        }
+
+        shinWasTouched = shinIsTouchedNow;
 
         if (flinchStarted)
         {
@@ -590,6 +616,14 @@ public class HorseFsm : MonoBehaviour
         }
     }
 
+    private void TriggerFlinchAnimation(int status)
+    {
+        animator.SetInteger("FlinchState", status);
+        animator.SetLayerWeight(6, 1);
+        flinchStarted = true;
+        flinchPlaying = false;
+    }
+
     // ── Body-touch ref-count API (collègue) ──────────────────────────────────
     public void NotifyBodyTouch(bool entering)
     {
@@ -716,6 +750,11 @@ public class HorseFsm : MonoBehaviour
         legTouchTimer = 0f;
         lastKickedLeg = 0;
 
+        shinTouched = 0;
+        shinTouchTimer = 0f;
+        shinTouchWasContinuous = false;
+        shinWasTouched = false;
+
         startFeedingTimer = 0f;
         exitFeedingTimer = 0f;
         startAnxiousTimer = 0f;
@@ -767,6 +806,13 @@ public class HorseFsm : MonoBehaviour
         legTouched = legIndex;
         legTouchTimer = 0f;
         if (legIndex != 0) legTouchWasContinuous = cameFromContinuousCaress;
+    }
+
+    public void SetShinTouched(int legIndex, bool cameFromContinuousCaress = false)
+    {
+        shinTouched = legIndex;
+        shinTouchTimer = 0f;
+        if (legIndex != 0) shinTouchWasContinuous = cameFromContinuousCaress;
     }
 
     public void SetHoofTouched(int hoofIndex, bool cameFromContinuousCaress = false)
