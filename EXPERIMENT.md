@@ -46,6 +46,11 @@ The project does not use a custom in-app recorder — internal capture relies on
 
 > ⚠️ **Important:** The **participant must start the internal recording themselves** (via the Quest native shortcut) right before entering the app. Internal recording stops automatically the moment the headset is removed, which is essential for data integrity. Only the wearer can reliably trigger this start action and keep the headset on throughout the session.
 
+Since the experimenter cannot see the headset's display once it's on the participant's head, this step needs to be **actively guided out loud**:
+1. Once the headset is on the participant, verbally walk them through the native recording shortcut step by step (the experimenter cannot see the menu to check it for them).
+2. Ask the participant to confirm out loud once recording has started (e.g. a visible on-screen indicator, or a confirmation sound/vibration, depending on the OS version).
+3. Only proceed to launching the application (see [§3](#3-starting-the-experience)) once this confirmation is given — starting the app before recording is running means that portion of the session won't be captured, and it can't be restarted without removing the headset (which stops the run entirely).
+
 ### 2.3 Creating and saving the play space (boundary)
 Configure the headset's boundary before starting:
 1. Put on the headset and follow the system boundary setup flow.
@@ -162,8 +167,18 @@ Runs automatically in the background from the moment the app starts — no manua
    >```powershell
    >adb shell rm /sdcard/Android/data/com.UnityTechnologies.com.unity.template.urpblank/files/player_position_log_*.csv
    >```
- 
-4. **Archive the video and CSV together** for that session — group them under a consistent folder name per session, e.g. `{participant_id}_{date}/`, containing both video files and the CSV.
+
+4. **Retrieve the internal (in-headset) video recording** via ADB. The Quest 3's native screen recordings are saved under `/sdcard/Oculus/VideoShots/`, not under the app's own data folder:
+```powershell
+   adb shell ls /sdcard/Oculus/VideoShots/
+```
+   List the folder first to identify the exact filename for this session — recordings are named `<package_name>-YYYYMMDD-HHMMSS-N.mp4`. Then pull it:
+```powershell
+   adb pull /sdcard/Oculus/VideoShots/com.UnityTechnologies.com.unity.template.urpblank-20260827-151239-0.mp4
+```
+   > Replace the filename with the one matching this session's timestamp, as identified from the `ls` output above.
+
+5. **Archive the video and CSV together** for that session — group them under a consistent folder name per session, e.g. `{participant_id}_{date}/`, containing both video files and the CSV.
 ---
 
 ## 7. Remarks
