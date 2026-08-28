@@ -444,10 +444,10 @@ public class HorseFsm : MonoBehaviour
         {
             case HorseStates.None:
 
-                // Ne pilote les oreilles par physique que si la couche Ears Animator
-                // (layer 7) n'est pas active (isAnxious=false), pour eviter un conflit.
-                // Happy est traite comme Neutral pour les oreilles: HappyEars a ete
-                // retire, donc l'etat Happy laisse les oreilles en position neutre.
+                // Drive the ears physically only when the Ears Animator layer
+                // (layer 7) is not active (isAnxious=false), to avoid a conflict.
+                // Happy is treated as Neutral for the ears: HappyEars was
+                // removed, so the Happy state leaves the ears in a neutral position.
                 if (emotionalState == EmotionalState.Neutral || emotionalState == EmotionalState.Happy)
                     ChangeEarRotation(Quaternion.identity, Quaternion.identity);
 
@@ -468,7 +468,7 @@ public class HorseFsm : MonoBehaviour
                     startFeedingTimer = 0;
                 }
 
-                // ── Anxious trigger (collègue : RumpTouchIsTrusted) ──────────
+                // ── Anxious trigger  ──────────
                 if ((touchedBehind || legTouched != 0) && !RumpTouchIsTrusted && !TouchIsSafe && MovementAllowed)
                 {
                     HorseEmotion = -3f;
